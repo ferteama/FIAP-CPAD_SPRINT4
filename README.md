@@ -187,17 +187,10 @@ simulado (`analisarFotoVegetacaoSimulado`) usado como fallback.
 
 ## Vídeo de Demonstração
 
-> Link: _(adicionar após publicação no YouTube como "Não listado")_
-
-Roteiro completo em [`Roteiro_Final_Equipe11.docx`](../Roteiro_Final_Equipe11.docx).
+> Link: (https://youtu.be/4RbNBSrX2F0)
 
 ---
 
 ## Entrega Sprint 3
-
-Conforme o enunciado, a entrega é **apenas um arquivo `.txt`** contendo:
-nome e RM de cada integrante (tabela acima), link do repositório GitHub
-atualizado e link do vídeo de demonstração (YouTube, não listado). Não
-enviar pelo Teams nem fora do prazo.
 
 Documento de testes manuais: [`docs/testes-manuais-sprint3.md`](./docs/testes-manuais-sprint3.md).
