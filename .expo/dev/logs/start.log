@@ -1,0 +1,90 @@
+{"_e":"root:init","_t":1789938208037,"format":"v0-jsonl","version":"56.1.24"}
+{"_e":"env:mode","_t":1789938208053,"nodeEnv":"development","babelEnv":"development","mode":"development"}
+{"_e":"env:load","_t":1789938208082,"mode":"development","files":[],"env":{}}
+{"_e":"devserver:start","_t":1789938212891,"mode":"development","web":true,"baseUrl":"","asyncRoutes":false,"routerRoot":"../..\\..\\app","serverComponents":false,"serverActions":false,"serverRendering":false,"apiRoutes":false,"exporting":false}
+{"_e":"metro:config","_t":1789938219160,"serverRoot":"../..\\..","projectRoot":"../..\\..","exporting":false,"flags":{"autolinkingModuleResolution":false,"serverActions":false,"serverComponents":false,"reactCompiler":false,"optimizeGraph":false,"treeshaking":false,"logbox":false}}
+{"_e":"metro:instantiate","_t":1789938234929,"atlas":false,"workers":10,"host":"::","port":8081}
+{"_e":"root:init","_t":1789938435867,"format":"v0-jsonl","version":"56.1.26"}
+{"_e":"env:mode","_t":1789938435868,"nodeEnv":"development","babelEnv":"development","mode":"development"}
+{"_e":"env:load","_t":1789938435872,"mode":"development","files":[],"env":{}}
+{"_e":"devserver:start","_t":1789938437794,"mode":"development","web":true,"baseUrl":"","asyncRoutes":false,"routerRoot":"../..\\..\\app","serverComponents":false,"serverActions":false,"serverRendering":false,"apiRoutes":false,"exporting":false}
+{"_e":"metro:config","_t":1789938439208,"serverRoot":"../..\\..","projectRoot":"../..\\..","exporting":false,"flags":{"autolinkingModuleResolution":false,"serverActions":false,"serverComponents":false,"reactCompiler":false,"optimizeGraph":false,"treeshaking":false,"logbox":false}}
+{"_e":"metro:instantiate","_t":1789938452117,"atlas":false,"workers":10,"host":"::","port":8081}
+{"_e":"metro:bundling:started","_t":1789938901568,"id":"1","platform":"web","environment":null,"entry":"index.js"}
+{"_e":"metro:bundling:progress","_t":1789938901569,"id":"1","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:progress","_t":1789938901572,"id":"1","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:progress","_t":1789938901673,"id":"1","progress":0.055022100289589995,"total":81,"current":19}
+{"_e":"metro:bundling:progress","_t":1789938901827,"id":"1","progress":0.055022100289589995,"total":98,"current":22}
+{"_e":"metro:bundling:progress","_t":1789938901931,"id":"1","progress":0.24686523476128316,"total":159,"current":79}
+{"_e":"metro:bundling:progress","_t":1789938902041,"id":"1","progress":0.26265625,"total":160,"current":82}
+{"_e":"metro:bundling:progress","_t":1789938902142,"id":"1","progress":0.30375129132231404,"total":176,"current":97}
+{"_e":"metro:bundling:progress","_t":1789938902241,"id":"1","progress":0.4444444444444444,"total":237,"current":158}
+{"_e":"metro:bundling:progress","_t":1789938902363,"id":"1","progress":0.47844834320173724,"total":253,"current":175}
+{"_e":"metro:bundling:progress","_t":1789938902393,"id":"1","progress":0.48393194706994325,"total":253,"current":176}
+{"_e":"metro:bundling:progress","_t":1789938902497,"id":"1","progress":0.7717134452160493,"total":288,"current":253}
+{"_e":"metro:bundling:progress","_t":1789938902599,"id":"1","progress":0.855775658097168,"total":307,"current":284}
+{"_e":"metro:bundling:progress","_t":1789938902699,"id":"1","progress":0.8807100591715976,"total":325,"current":305}
+{"_e":"metro:bundling:progress","_t":1789938902817,"id":"1","progress":0.8807100591715976,"total":345,"current":323}
+{"_e":"metro:bundling:progress","_t":1789938902923,"id":"1","progress":0.9944675071554087,"total":361,"current":360}
+{"_e":"metro:bundling:progress","_t":1789938904925,"id":"1","progress":0.999,"total":361,"current":361}
+{"_e":"metro:bundling:done","_t":1789938905071,"id":"1","total":361,"ms":3502.7166}
+{"_e":"metro:client_log","_t":1789938905232,"level":"log","data":["Running application \"main\" with appParams:\n","{\"hydrate\": undefined, \"rootTag\": \"#root\"}","\nDevelopment-level warnings: ON.\nPerformance optimizations: OFF."]}
+{"_e":"metro:client_log","_t":1789938905258,"level":"warn","data":["\"shadow*\" style props are deprecated. Use \"boxShadow\"."]}
+{"_e":"metro:bundling:started","_t":1789941288340,"id":"6","platform":"web","environment":null,"entry":"index.js"}
+{"_e":"metro:bundling:progress","_t":1789941288340,"id":"6","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:done","_t":1789941288356,"id":"6","total":1,"ms":15.9665}
+{"_e":"metro:client_log","_t":1789941288499,"level":"log","data":["Running application \"main\" with appParams:\n","{\"hydrate\": undefined, \"rootTag\": \"#root\"}","\nDevelopment-level warnings: ON.\nPerformance optimizations: OFF."]}
+{"_e":"metro:client_log","_t":1789941288523,"level":"warn","data":["\"shadow*\" style props are deprecated. Use \"boxShadow\"."]}
+{"_e":"metro:client_log","_t":1789941289838,"level":"warn","data":["props.pointerEvents is deprecated. Use style.pointerEvents"]}
+{"_e":"metro:bundling:started","_t":1789941324626,"id":"b","platform":"web","environment":null,"entry":"index.js"}
+{"_e":"metro:bundling:progress","_t":1789941324626,"id":"b","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:done","_t":1789941324643,"id":"b","total":1,"ms":17.7265}
+{"_e":"metro:client_log","_t":1789941324821,"level":"log","data":["Running application \"main\" with appParams:\n","{\"hydrate\": undefined, \"rootTag\": \"#root\"}","\nDevelopment-level warnings: ON.\nPerformance optimizations: OFF."]}
+{"_e":"metro:client_log","_t":1789941324846,"level":"warn","data":["\"shadow*\" style props are deprecated. Use \"boxShadow\"."]}
+{"_e":"metro:bundling:started","_t":1789944423057,"id":"g","platform":"web","environment":null,"entry":"index.js"}
+{"_e":"metro:bundling:progress","_t":1789944423057,"id":"g","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:done","_t":1789944423075,"id":"g","total":1,"ms":18.0689}
+{"_e":"metro:client_log","_t":1789944423245,"level":"log","data":["Running application \"main\" with appParams:\n","{\"hydrate\": undefined, \"rootTag\": \"#root\"}","\nDevelopment-level warnings: ON.\nPerformance optimizations: OFF."]}
+{"_e":"metro:client_log","_t":1789944423268,"level":"warn","data":["\"shadow*\" style props are deprecated. Use \"boxShadow\"."]}
+{"_e":"metro:client_log","_t":1789944427357,"level":"warn","data":["props.pointerEvents is deprecated. Use style.pointerEvents"]}
+{"_e":"metro:bundling:started","_t":1789944448501,"id":"k","platform":"web","environment":null,"entry":"index.js"}
+{"_e":"metro:bundling:progress","_t":1789944448502,"id":"k","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:done","_t":1789944448516,"id":"k","total":1,"ms":14.1037}
+{"_e":"metro:client_log","_t":1789944448663,"level":"log","data":["Running application \"main\" with appParams:\n","{\"hydrate\": undefined, \"rootTag\": \"#root\"}","\nDevelopment-level warnings: ON.\nPerformance optimizations: OFF."]}
+{"_e":"metro:client_log","_t":1789944448682,"level":"warn","data":["\"shadow*\" style props are deprecated. Use \"boxShadow\"."]}
+{"_e":"metro:bundling:started","_t":1789944456306,"id":"p","platform":"web","environment":null,"entry":"index.js"}
+{"_e":"metro:bundling:progress","_t":1789944456306,"id":"p","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:done","_t":1789944456322,"id":"p","total":1,"ms":15.4579}
+{"_e":"metro:client_log","_t":1789944456447,"level":"log","data":["Running application \"main\" with appParams:\n","{\"hydrate\": undefined, \"rootTag\": \"#root\"}","\nDevelopment-level warnings: ON.\nPerformance optimizations: OFF."]}
+{"_e":"metro:client_log","_t":1789944456457,"level":"warn","data":["\"shadow*\" style props are deprecated. Use \"boxShadow\"."]}
+{"_e":"metro:bundling:started","_t":1789944511270,"id":"u","platform":"web","environment":null,"entry":"index.js"}
+{"_e":"metro:bundling:progress","_t":1789944511270,"id":"u","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:done","_t":1789944511284,"id":"u","total":1,"ms":13.4781}
+{"_e":"metro:client_log","_t":1789944511432,"level":"log","data":["Running application \"main\" with appParams:\n","{\"hydrate\": undefined, \"rootTag\": \"#root\"}","\nDevelopment-level warnings: ON.\nPerformance optimizations: OFF."]}
+{"_e":"metro:client_log","_t":1789944511455,"level":"warn","data":["\"shadow*\" style props are deprecated. Use \"boxShadow\"."]}
+{"_e":"metro:client_log","_t":1789944513161,"level":"warn","data":["props.pointerEvents is deprecated. Use style.pointerEvents"]}
+{"_e":"metro:bundling:started","_t":1789944685437,"id":"z","platform":"web","environment":null,"entry":"index.js"}
+{"_e":"metro:bundling:progress","_t":1789944685437,"id":"z","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:progress","_t":1789944685438,"id":"z","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:progress","_t":1789944685538,"id":"z","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:progress","_t":1789944685656,"id":"z","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:done","_t":1789944685679,"id":"z","total":1,"ms":241.276}
+{"_e":"metro:client_log","_t":1789944685813,"level":"log","data":["Running application \"main\" with appParams:\n","{\"hydrate\": undefined, \"rootTag\": \"#root\"}","\nDevelopment-level warnings: ON.\nPerformance optimizations: OFF."]}
+{"_e":"metro:client_log","_t":1789944685833,"level":"warn","data":["\"shadow*\" style props are deprecated. Use \"boxShadow\"."]}
+{"_e":"metro:bundling:started","_t":1789944796299,"id":"14","platform":"web","environment":null,"entry":"index.js"}
+{"_e":"metro:bundling:progress","_t":1789944796299,"id":"14","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:done","_t":1789944796313,"id":"14","total":1,"ms":14.7024}
+{"_e":"metro:client_log","_t":1789944796458,"level":"log","data":["Running application \"main\" with appParams:\n","{\"hydrate\": undefined, \"rootTag\": \"#root\"}","\nDevelopment-level warnings: ON.\nPerformance optimizations: OFF."]}
+{"_e":"metro:client_log","_t":1789944796480,"level":"warn","data":["\"shadow*\" style props are deprecated. Use \"boxShadow\"."]}
+{"_e":"metro:bundling:started","_t":1789945740588,"id":"19","platform":"web","environment":null,"entry":"index.js"}
+{"_e":"metro:bundling:progress","_t":1789945740588,"id":"19","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:done","_t":1789945740606,"id":"19","total":1,"ms":17.6445}
+{"_e":"metro:client_log","_t":1789945740762,"level":"log","data":["Running application \"main\" with appParams:\n","{\"hydrate\": undefined, \"rootTag\": \"#root\"}","\nDevelopment-level warnings: ON.\nPerformance optimizations: OFF."]}
+{"_e":"metro:client_log","_t":1789945740786,"level":"warn","data":["\"shadow*\" style props are deprecated. Use \"boxShadow\"."]}
+{"_e":"metro:client_log","_t":1789945814026,"level":"warn","data":["props.pointerEvents is deprecated. Use style.pointerEvents"]}
+{"_e":"metro:client_log","_t":1789945818895,"level":"warn","data":["[expo-image-picker] `ImagePicker.MediaTypeOptions` have been deprecated. Use `ImagePicker.MediaType` or an array of `ImagePicker.MediaType` instead."]}
+{"_e":"metro:bundling:started","_t":1789954178722,"id":"1f","platform":"web","environment":null,"entry":"index.js"}
+{"_e":"metro:bundling:progress","_t":1789954178722,"id":"1f","progress":0,"total":1,"current":0}
+{"_e":"metro:bundling:done","_t":1789954178739,"id":"1f","total":1,"ms":16.9302}
+{"_e":"metro:client_log","_t":1789954178886,"level":"log","data":["Running application \"main\" with appParams:\n","{\"hydrate\": undefined, \"rootTag\": \"#root\"}","\nDevelopment-level warnings: ON.\nPerformance optimizations: OFF."]}
+{"_e":"metro:client_log","_t":1789954178911,"level":"warn","data":["\"shadow*\" style props are deprecated. Use \"boxShadow\"."]}

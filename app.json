@@ -1,0 +1,28 @@
+{
+  "expo": {
+    "name": "Drone Vision Watch",
+    "slug": "drone-vision-watch",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#F6FAF7"
+      },
+      "permissions": [
+        "CAMERA",
+        "READ_MEDIA_IMAGES"
+      ]
+    },
+    "plugins": [
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "O app usa a galeria para anexar fotos do local da ocorrência.",
+          "cameraPermission": "O app usa a câmera para registrar fotos do local da ocorrência."
+        }
+      ],
+      "expo-router"
+    ]
+  }
+}
