@@ -1,0 +1,40 @@
+type Project @table {
+  name: String!
+  locationCoordinates: String!
+  description: String
+  startDate: Date
+}
+
+type DroneFlight @table {
+  startTime: Timestamp!
+  endTime: Timestamp!
+  pilotName: String!
+  flightLogData: String
+  totalDistance: Float
+  project: Project!
+}
+
+type MediaAsset @table {
+  url: String!
+  fileType: String!
+  timestamp: Timestamp!
+  resolution: String
+  durationSeconds: Int
+  droneFlight: DroneFlight!
+}
+
+type PointOfInterest @table {
+  description: String!
+  severityLevel: String!
+  timestampInVideo: Timestamp
+  coordinates: String
+  mediaAsset: MediaAsset!
+}
+
+type InspectionReport @table {
+  reportDate: Date!
+  status: String!
+  summaryNotes: String
+  pdfStorageUrl: String
+  project: Project!
+}

@@ -1,7 +1,15 @@
 # API de Análise de Vegetação
 
 Backend em Python (FastAPI) que recebe uma foto do app e devolve a altura
-estimada da vegetação, usando segmentação de cor com OpenCV.
+estimada da vegetação, o risco e a previsão de corte:
+
+1. **OpenCV** segmenta o verde (HSV) e mede a cobertura de vegetação.
+2. **XGBoost** (`modelo.py`) estima a altura e os dias até o limite de 10 cm a
+   partir de (cobertura, temperatura, chuva dos últimos 7 dias).
+
+A resposta inclui o campo `modelo` (`"xgboost"` ou `"regra"`, se os arquivos de
+modelo não existirem). Imagem inválida devolve **HTTP 422** (o app então usa o
+*fallback* offline em vez de gravar um registro zerado).
 
 ## Rodar localmente
 
@@ -50,9 +58,27 @@ Duas opções gratuitas simples:
 Depois do deploy, troque `EXPO_PUBLIC_API_URL` no `.env` do app pela URL pública
 gerada (ex: `https://sua-api.onrender.com`).
 
-## Próximo passo (pós-Sprint)
+## Modelo XGBoost
 
-A função `mapear_cobertura_para_altura` em `main.py` usa uma regra fixa.
-O passo seguinte é treinar o modelo XGBoost citado no desafio com dados reais
-de (cobertura de imagem, chuva, temperatura) → altura real medida, e substituir
-essa função por `modelo.predict(...)`.
+Os modelos treinados ficam em `modelos/` (`altura.json`, `dias_ate_limite.json`,
+`metricas.json`) e são carregados na inicialização.
+
+```bash
+python treinar_modelo.py   # re-treina e imprime as métricas
+```
+
+> **Dados sintéticos.** Não há histórico real de medições da Motiva. `gerar_dataset()`
+> (em `modelo.py`) simula uma dinâmica plausível de crescimento. As métricas medem o ajuste
+> a esse gerador — **não** a precisão em campo. Para usar dados reais, troque `gerar_dataset()`
+> pelo carregamento de um CSV com as colunas `cobertura_pct, temperatura_c, chuva_mm_7d` e as
+> alturas medidas, e rode `python treinar_modelo.py`.
+
+Parâmetros opcionais do `POST /analisar`: `temperatura_c` e `chuva_mm`
+(padrões: 27 °C e 20 mm).
+
+## Testes
+
+```bash
+pip install pytest httpx
+pytest -q
+```

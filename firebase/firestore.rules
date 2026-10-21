@@ -1,0 +1,35 @@
+rules_version = '2';
+
+// Regras do Cloud Firestore — Drone Vision Watch (Equipe 11)
+// Publicar em: Console Firebase → Firestore Database → Regras
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function logado() {
+      return request.auth != null;
+    }
+
+    // Perfil: cada operador só lê e escreve o próprio documento
+    match /users/{uid} {
+      allow read, write: if logado() && request.auth.uid == uid;
+    }
+
+    // Trechos em monitoramento: equipe autenticada lê e grava; ninguém apaga
+    // (uma roçada é registrada em `intervencoes`, não por exclusão).
+    match /ocorrencias/{id} {
+      allow read: if logado();
+      allow create: if logado()
+        && request.resource.data.keys().hasAll(['local', 'risco', 'data']);
+      allow update: if logado();
+      allow delete: if false;
+    }
+
+    // Histórico de intervenções: imutável depois de criado (trilha de auditoria)
+    match /intervencoes/{id} {
+      allow read: if logado();
+      allow create: if logado()
+        && request.resource.data.keys().hasAll(['ocorrenciaId', 'local', 'dataCorte', 'responsavel']);
+      allow update, delete: if false;
+    }
+  }
+}

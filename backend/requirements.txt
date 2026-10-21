@@ -3,3 +3,5 @@ uvicorn[standard]>=0.30
 opencv-python-headless>=4.10
 numpy>=1.26
 python-multipart>=0.0.9
+xgboost>=2.0
+scikit-learn>=1.4   # só para treinar (treinar_modelo.py)

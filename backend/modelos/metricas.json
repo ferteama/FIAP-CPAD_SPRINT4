@@ -1,0 +1,16 @@
+{
+  "dataset": "sintético (6000 amostras, 80/20)",
+  "features": [
+    "cobertura_pct",
+    "temperatura_c",
+    "chuva_mm_7d"
+  ],
+  "altura_cm": {
+    "MAE": 0.655,
+    "R2": 0.986
+  },
+  "dias_ate_limite": {
+    "MAE": 1.11,
+    "R2": 0.958
+  }
+}

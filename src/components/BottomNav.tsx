@@ -4,7 +4,7 @@ import { Feather } from "@expo/vector-icons";
 
 import { CORES } from "../utils/tema";
 
-export type AbaNav = "dashboard" | "lista" | "cadastro" | "relatorio";
+export type AbaNav = "dashboard" | "lista" | "cadastro" | "historico" | "relatorio";
 
 type BottomNavProps = {
   abaAtiva: AbaNav;
@@ -15,6 +15,7 @@ const ABAS: { chave: AbaNav; label: string; icone: keyof typeof Feather.glyphMap
   { chave: "dashboard", label: "Início", icone: "home" },
   { chave: "lista", label: "Trechos", icone: "list" },
   { chave: "cadastro", label: "Vistoria", icone: "plus-circle" },
+  { chave: "historico", label: "Histórico", icone: "clock" },
   { chave: "relatorio", label: "Relatório", icone: "bar-chart-2" },
 ];
 

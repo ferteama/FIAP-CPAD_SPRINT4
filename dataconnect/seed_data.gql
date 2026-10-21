@@ -1,0 +1,76 @@
+mutation SeedDatabase @transaction {
+  project_insertMany(data: [
+    {
+      id: "00000000-0000-0000-0000-000000000001",
+      name: "Alpha Bridge Inspection",
+      locationCoordinates: "37.7749,-122.4194"
+    },
+    {
+      id: "00000000-0000-0000-0000-000000000002",
+      name: "Delta Power Plant Survey",
+      locationCoordinates: "34.0522,-118.2437"
+    }
+  ])
+  droneFlight_insertMany(data: [
+    {
+      id: "10000000-0000-0000-0000-000000000001",
+      projectId: "00000000-0000-0000-0000-000000000001",
+      startTime: "2023-10-01T08:00:00Z",
+      endTime: "2023-10-01T09:00:00Z",
+      pilotName: "Alice Pilot",
+      totalDistance: 12.5
+    },
+    {
+      id: "10000000-0000-0000-0000-000000000002",
+      projectId: "00000000-0000-0000-0000-000000000002",
+      startTime: "2023-10-02T10:00:00Z",
+      endTime: "2023-10-02T11:30:00Z",
+      pilotName: "Bob Pilot",
+      totalDistance: 25.8
+    }
+  ])
+  mediaAsset_insertMany(data: [
+    {
+      id: "20000000-0000-0000-0000-000000000001",
+      droneFlightId: "10000000-0000-0000-0000-000000000001",
+      url: "gs://bucket/assets/img1.jpg",
+      fileType: "image/jpeg",
+      timestamp: "2023-10-01T08:15:00Z"
+    },
+    {
+      id: "20000000-0000-0000-0000-000000000002",
+      droneFlightId: "10000000-0000-0000-0000-000000000002",
+      url: "gs://bucket/assets/video1.mp4",
+      fileType: "video/mp4",
+      timestamp: "2023-10-02T10:30:00Z"
+    }
+  ])
+  pointOfInterest_insertMany(data: [
+    {
+      id: "30000000-0000-0000-0000-000000000001",
+      mediaAssetId: "20000000-0000-0000-0000-000000000001",
+      description: "Cracked concrete identified",
+      severityLevel: "High"
+    },
+    {
+      id: "30000000-0000-0000-0000-000000000002",
+      mediaAssetId: "20000000-0000-0000-0000-000000000002",
+      description: "Minor vegetation growth on structure",
+      severityLevel: "Low"
+    }
+  ])
+  inspectionReport_insertMany(data: [
+    {
+      id: "40000000-0000-0000-0000-000000000001",
+      projectId: "00000000-0000-0000-0000-000000000001",
+      reportDate: "2023-10-05",
+      status: "Finalized"
+    },
+    {
+      id: "40000000-0000-0000-0000-000000000002",
+      projectId: "00000000-0000-0000-0000-000000000002",
+      reportDate: "2023-10-06",
+      status: "Draft"
+    }
+  ])
+}

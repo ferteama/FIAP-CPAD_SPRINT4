@@ -25,6 +25,19 @@ export type ResultadoAnalise = {
   coberturaPercentual: number;
   risco: NivelRisco;
   previsaoDiasProximoCorte: number;
+  /** "xgboost" quando o backend usou o modelo treinado; "regra" no modo antigo. */
+  modelo?: string;
+};
+
+/** Tempo máximo de espera pela API — sem isso o app ficaria "Analisando..." para sempre. */
+export const TIMEOUT_API_MS = 15000;
+
+export type OpcoesAnalise = {
+  /** Usado no Perfil → "Simular API offline" para demonstrar o fallback. */
+  simularFalha?: boolean;
+  /** Dados de clima opcionais; o modelo XGBoost usa quando disponíveis. */
+  temperaturaC?: number;
+  chuvaMm?: number;
 };
 
 export class VegetationApiError extends Error {}
@@ -38,8 +51,13 @@ export class VegetationApiError extends Error {}
  */
 export async function analisarFotoVegetacao(
   fotoUri: string,
-  local: string
+  local: string,
+  opcoes: OpcoesAnalise = {}
 ): Promise<ResultadoAnalise> {
+  if (opcoes.simularFalha) {
+    throw new VegetationApiError("Falha simulada (modo de demonstração).");
+  }
+
   const formData = new FormData();
 
   // React Native aceita esse formato "pseudo-File" para multipart/form-data.
@@ -50,12 +68,18 @@ export async function analisarFotoVegetacao(
     type: "image/jpeg",
   } as any);
   formData.append("local", local);
+  if (opcoes.temperaturaC !== undefined) formData.append("temperatura_c", String(opcoes.temperaturaC));
+  if (opcoes.chuvaMm !== undefined) formData.append("chuva_mm", String(opcoes.chuvaMm));
+
+  const controlador = new AbortController();
+  const timer = setTimeout(() => controlador.abort(), TIMEOUT_API_MS);
 
   let response: Response;
   try {
     response = await fetch(`${API_URL}/analisar`, {
       method: "POST",
       body: formData,
+      signal: controlador.signal,
       headers: {
         // NÃO defina "Content-Type" manualmente aqui — o fetch precisa
         // gerar o boundary do multipart sozinho. Definir na mão quebra o upload.
@@ -64,8 +88,12 @@ export async function analisarFotoVegetacao(
     });
   } catch (err) {
     throw new VegetationApiError(
-      "Não foi possível conectar à API de análise. Verifique sua conexão e o endereço configurado."
+      controlador.signal.aborted
+        ? "A API de análise demorou demais para responder."
+        : "Não foi possível conectar à API de análise. Verifique sua conexão e o endereço configurado."
     );
+  } finally {
+    clearTimeout(timer);
   }
 
   if (!response.ok) {
@@ -82,6 +110,7 @@ export async function analisarFotoVegetacao(
     coberturaPercentual: data.cobertura_percentual,
     risco: data.risco as NivelRisco,
     previsaoDiasProximoCorte: data.previsao_dias_proximo_corte,
+    modelo: data.modelo,
   };
 }
 
@@ -104,5 +133,6 @@ export function analisarFotoVegetacaoSimulado(): ResultadoAnalise {
     coberturaPercentual: cobertura,
     risco,
     previsaoDiasProximoCorte: risco === "alto" ? 0 : risco === "medio" ? 4 : 12,
+    modelo: "simulado",
   };
 }

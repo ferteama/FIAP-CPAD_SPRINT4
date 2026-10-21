@@ -2,7 +2,7 @@
   "expo": {
     "name": "Drone Vision Watch",
     "slug": "drone-vision-watch",
-    "version": "1.0.0",
+    "version": "2.0.0",
     "orientation": "portrait",
     "userInterfaceStyle": "light",
     "android": {
@@ -10,9 +10,11 @@
         "backgroundColor": "#F6FAF7"
       },
       "permissions": [
-        "CAMERA",
-        "READ_MEDIA_IMAGES"
-      ]
+        "android.permission.CAMERA",
+        "android.permission.READ_MEDIA_IMAGES",
+        "android.permission.RECORD_AUDIO"
+      ],
+      "package": "br.com.motiva.dronevisionwatch"
     },
     "plugins": [
       [
@@ -23,6 +25,17 @@
         }
       ],
       "expo-router"
-    ]
+    ],
+    "ios": {
+      "bundleIdentifier": "br.com.motiva.dronevisionwatch",
+      "supportsTablet": false
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "d6ebb451-f725-4b66-b4c5-4c697e268de9"
+      }
+    },
+    "owner": "marcofonseca"
   }
 }

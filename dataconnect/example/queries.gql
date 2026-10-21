@@ -1,0 +1,140 @@
+mutation CreateProject($data: Project_Data!) @auth(level: USER) {
+  project_insert(data: $data)
+}
+
+mutation UpdateProject($id: UUID!, $data: Project_Data!) @auth(level: USER) {
+  project_update(id: $id, data: $data)
+}
+
+mutation DeleteProject($id: UUID!) @auth(level: USER) {
+  project_delete(id: $id)
+}
+
+query GetProject($id: UUID!) @auth(level: PUBLIC, insecureReason: "Projects are public records.") {
+  project(id: $id) {
+    name
+    locationCoordinates
+    description
+    startDate
+  }
+}
+
+query ListProjects @auth(level: PUBLIC, insecureReason: "Projects are public records.") {
+  projects {
+    id
+    name
+    locationCoordinates
+  }
+}
+
+mutation CreateDroneFlight($data: DroneFlight_Data!) @auth(level: USER) {
+  droneFlight_insert(data: $data)
+}
+
+mutation UpdateDroneFlight($id: UUID!, $data: DroneFlight_Data!) @auth(level: USER) {
+  droneFlight_update(id: $id, data: $data)
+}
+
+mutation DeleteDroneFlight($id: UUID!) @auth(level: USER) {
+  droneFlight_delete(id: $id)
+}
+
+query GetDroneFlight($id: UUID!) @auth(level: USER) {
+  droneFlight(id: $id) {
+    startTime
+    endTime
+    pilotName
+  }
+}
+
+query ListDroneFlights @auth(level: USER) {
+  droneFlights {
+    id
+    startTime
+    pilotName
+  }
+}
+
+mutation CreateMediaAsset($data: MediaAsset_Data!) @auth(level: USER) {
+  mediaAsset_insert(data: $data)
+}
+
+mutation UpdateMediaAsset($id: UUID!, $data: MediaAsset_Data!) @auth(level: USER) {
+  mediaAsset_update(id: $id, data: $data)
+}
+
+mutation DeleteMediaAsset($id: UUID!) @auth(level: USER) {
+  mediaAsset_delete(id: $id)
+}
+
+query GetMediaAsset($id: UUID!) @auth(level: USER) {
+  mediaAsset(id: $id) {
+    url
+    fileType
+    timestamp
+  }
+}
+
+query ListMediaAssets @auth(level: USER) {
+  mediaAssets {
+    id
+    url
+    timestamp
+  }
+}
+
+mutation CreatePointOfInterest($data: PointOfInterest_Data!) @auth(level: USER) {
+  pointOfInterest_insert(data: $data)
+}
+
+mutation UpdatePointOfInterest($id: UUID!, $data: PointOfInterest_Data!) @auth(level: USER) {
+  pointOfInterest_update(id: $id, data: $data)
+}
+
+mutation DeletePointOfInterest($id: UUID!) @auth(level: USER) {
+  pointOfInterest_delete(id: $id)
+}
+
+query GetPointOfInterest($id: UUID!) @auth(level: USER) {
+  pointOfInterest(id: $id) {
+    description
+    severityLevel
+    coordinates
+  }
+}
+
+query ListPointsOfInterest @auth(level: USER) {
+  pointOfInterests {
+    id
+    description
+    severityLevel
+  }
+}
+
+mutation CreateInspectionReport($data: InspectionReport_Data!) @auth(level: USER) {
+  inspectionReport_insert(data: $data)
+}
+
+mutation UpdateInspectionReport($id: UUID!, $data: InspectionReport_Data!) @auth(level: USER) {
+  inspectionReport_update(id: $id, data: $data)
+}
+
+mutation DeleteInspectionReport($id: UUID!) @auth(level: USER) {
+  inspectionReport_delete(id: $id)
+}
+
+query GetInspectionReport($id: UUID!) @auth(level: USER) {
+  inspectionReport(id: $id) {
+    reportDate
+    status
+    summaryNotes
+  }
+}
+
+query ListInspectionReports @auth(level: USER) {
+  inspectionReports {
+    id
+    reportDate
+    status
+  }
+}

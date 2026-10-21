@@ -1,52 +1,77 @@
 import React, { useState } from "react";
-import { SafeAreaView, StatusBar, StyleSheet, View } from "react-native";
+import { ActivityIndicator, SafeAreaView, StatusBar, StyleSheet, View } from "react-native";
 
+import { AuthProvider, useAuth } from "./src/context/AuthContext";
+import { ConfigDemoProvider } from "./src/context/ConfigDemoContext";
 import { OcorrenciasProvider } from "./src/context/OcorrenciasContext";
+import LoginScreen from "./src/screens/LoginScreen";
 import DashboardScreen from "./src/screens/DashboardScreen";
 import ListaScreen from "./src/screens/ListaScreen";
 import CadastroScreen from "./src/screens/CadastroScreen";
 import DetalheScreen from "./src/screens/DetalheScreen";
+import HistoricoScreen from "./src/screens/HistoricoScreen";
 import RelatorioScreen from "./src/screens/RelatorioScreen";
+import PerfilScreen from "./src/screens/PerfilScreen";
 import { BottomNav, AbaNav } from "./src/components";
 import { Ocorrencia } from "./src/interfaces/ocorrencia";
 import { CORES } from "./src/utils/tema";
 
-// "detalhe" fica fora das abas — é uma tela de "drill-down" acessada
-// a partir do Dashboard ou da lista de Trechos, sem entrada própria na nav.
-type Tela = AbaNav | "detalhe";
+// "detalhe" e "perfil" ficam fora das abas — são telas de drill-down,
+// acessadas a partir das abas, sem entrada própria na barra inferior.
+type Tela = AbaNav | "detalhe" | "perfil";
 
 export default function App() {
-  // Estado de navegação — controla qual tela/aba está visível
+  return (
+    <AuthProvider>
+      <ConfigDemoProvider>
+        <StatusBar barStyle="dark-content" backgroundColor={CORES.background} />
+        <SafeAreaView style={styles.safeArea}>
+          <Raiz />
+        </SafeAreaView>
+      </ConfigDemoProvider>
+    </AuthProvider>
+  );
+}
+
+/** Porteiro de autenticação: restaura sessão → login → app. */
+function Raiz() {
+  const { usuario, carregando } = useAuth();
+
+  if (carregando) {
+    return (
+      <View style={styles.centro}>
+        <ActivityIndicator size="large" color={CORES.primary} />
+      </View>
+    );
+  }
+
+  if (!usuario) return <LoginScreen />;
+
+  // key = uid: ao trocar de conta, o provider reinicia com o cache do novo usuário
+  return (
+    <OcorrenciasProvider key={usuario.uid}>
+      <Navegacao />
+    </OcorrenciasProvider>
+  );
+}
+
+function Navegacao() {
   const [telaAtual, setTelaAtual] = useState<Tela>("dashboard");
-
-  // Guarda a aba de onde veio o "detalhe", para voltar ao lugar certo
+  // Aba de onde veio o drill-down, para o "voltar" cair no lugar certo
   const [abaAnterior, setAbaAnterior] = useState<AbaNav>("dashboard");
+  const [ocorrenciaSelecionada, setOcorrenciaSelecionada] = useState<Ocorrencia | null>(null);
 
-  // Ocorrência selecionada para o detalhe
-  const [ocorrenciaSelecionada, setOcorrenciaSelecionada] =
-    useState<Ocorrencia | null>(null);
+  function abrirDrillDown(destino: "detalhe" | "perfil") {
+    if (telaAtual !== "detalhe" && telaAtual !== "perfil") setAbaAnterior(telaAtual);
+    setTelaAtual(destino);
+  }
 
   function irParaDetalhe(ocorrencia: Ocorrencia) {
-    setAbaAnterior(telaAtual === "detalhe" ? abaAnterior : (telaAtual as AbaNav));
     setOcorrenciaSelecionada(ocorrencia);
-    setTelaAtual("detalhe");
+    abrirDrillDown("detalhe");
   }
 
-  function irParaCadastro() {
-    setTelaAtual("cadastro");
-  }
-
-  function irParaLista() {
-    setOcorrenciaSelecionada(null);
-    setTelaAtual("lista");
-  }
-
-  function irParaDashboard() {
-    setOcorrenciaSelecionada(null);
-    setTelaAtual("dashboard");
-  }
-
-  function voltarDoDetalhe() {
+  function voltarDoDrillDown() {
     setOcorrenciaSelecionada(null);
     setTelaAtual(abaAnterior);
   }
@@ -61,67 +86,51 @@ export default function App() {
       case "dashboard":
         return (
           <DashboardScreen
-            onNovaVistoria={irParaCadastro}
-            onVerTrechos={irParaLista}
+            onNovaVistoria={() => selecionarAba("cadastro")}
+            onVerTrechos={() => selecionarAba("lista")}
             onVerDetalhe={irParaDetalhe}
+            onAbrirPerfil={() => abrirDrillDown("perfil")}
           />
         );
-
       case "lista":
         return (
           <ListaScreen
             onVerDetalhe={irParaDetalhe}
-            onNovaCadastro={irParaCadastro}
+            onNovaCadastro={() => selecionarAba("cadastro")}
           />
         );
-
       case "cadastro":
         return (
           <CadastroScreen
-            onVoltar={irParaDashboard}
-            onSucesso={irParaDashboard}
+            onVoltar={() => selecionarAba("dashboard")}
+            onSucesso={() => selecionarAba("dashboard")}
           />
         );
-
+      case "historico":
+        return <HistoricoScreen />;
       case "relatorio":
         return <RelatorioScreen />;
-
+      case "perfil":
+        return <PerfilScreen onVoltar={voltarDoDrillDown} />;
       case "detalhe":
         if (!ocorrenciaSelecionada) return null;
-        return (
-          <DetalheScreen
-            ocorrencia={ocorrenciaSelecionada}
-            onVoltar={voltarDoDetalhe}
-          />
-        );
-
+        return <DetalheScreen ocorrencia={ocorrenciaSelecionada} onVoltar={voltarDoDrillDown} />;
       default:
         return null;
     }
   }
 
-  // A navegação inferior fica escondida na tela de detalhe (drill-down)
-  const mostrarNavInferior = telaAtual !== "detalhe";
+  const mostrarNavInferior = telaAtual !== "detalhe" && telaAtual !== "perfil";
 
   return (
-    <OcorrenciasProvider>
-      <StatusBar
-        barStyle="dark-content"
-        backgroundColor={CORES.background}
-      />
-      <SafeAreaView style={styles.safeArea}>
-        <View style={{ flex: 1 }}>{renderTela()}</View>
-        {mostrarNavInferior && (
-          <BottomNav abaAtiva={telaAtual} onSelecionar={selecionarAba} />
-        )}
-      </SafeAreaView>
-    </OcorrenciasProvider>
+    <>
+      <View style={{ flex: 1 }}>{renderTela()}</View>
+      {mostrarNavInferior && <BottomNav abaAtiva={telaAtual} onSelecionar={selecionarAba} />}
+    </>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: CORES.background,
-  },
+  safeArea: { flex: 1, backgroundColor: CORES.background },
+  centro: { flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: CORES.background },
 });

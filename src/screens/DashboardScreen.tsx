@@ -13,6 +13,7 @@ import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
 
 import { EstatisticaCard, OcorrenciaCard, RankingBarra } from "../components";
 import { useOcorrencias } from "../context/OcorrenciasContext";
+import { useAuth } from "../context/AuthContext";
 import { Ocorrencia } from "../interfaces/ocorrencia";
 import {
   CORES,
@@ -27,7 +28,10 @@ import {
   alturaMediaCm,
   contarPorRisco,
   indiceConformidade,
+  intervencoesNoMes,
   ordenarPorAltura,
+  tempoMedioAtendimentoDias,
+  trechosReincidentes,
   parseNumero,
   trechosPrioritarios,
   vistoriasNoMes,
@@ -37,6 +41,7 @@ type DashboardScreenProps = {
   onNovaVistoria: () => void;
   onVerTrechos: () => void;
   onVerDetalhe: (ocorrencia: Ocorrencia) => void;
+  onAbrirPerfil: () => void;
 };
 
 function saudacaoPorHorario(): string {
@@ -50,8 +55,10 @@ export default function DashboardScreen({
   onNovaVistoria,
   onVerTrechos,
   onVerDetalhe,
+  onAbrirPerfil,
 }: DashboardScreenProps) {
-  const { ocorrencias, carregando } = useOcorrencias();
+  const { ocorrencias, intervencoes, carregando, statusSync } = useOcorrencias();
+  const { usuario } = useAuth();
 
   if (carregando) {
     return (
@@ -70,6 +77,16 @@ export default function DashboardScreen({
   const ranking = ordenarPorAltura(ocorrencias).slice(0, 8);
   const maiorAltura = ranking.length > 0 ? parseNumero(ranking[0].alturaGrama) : 0;
   const vistoriasMes = vistoriasNoMes(ocorrencias);
+  const rocadasMes = intervencoesNoMes(intervencoes);
+  const tma = tempoMedioAtendimentoDias(intervencoes);
+  const reincidentes = trechosReincidentes(intervencoes);
+  const primeiroNome = usuario?.nome.split(" ")[0] ?? "Operador";
+  const iniciais = (usuario?.nome ?? "O")
+    .split(" ")
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((p) => p[0].toUpperCase())
+    .join("");
 
   return (
     <View style={styles.container}>
@@ -92,13 +109,18 @@ export default function DashboardScreen({
                 resizeMode="contain"
               />
             </View>
-            <TouchableOpacity style={styles.sinoBotao} activeOpacity={0.8}>
-              <Feather name="bell" size={16} color="#FFFFFF" />
+            <TouchableOpacity
+              style={styles.sinoBotao}
+              activeOpacity={0.8}
+              onPress={onAbrirPerfil}
+              accessibilityLabel="Abrir perfil"
+            >
+              <Text style={styles.avatarIniciais}>{iniciais}</Text>
             </TouchableOpacity>
           </View>
 
           <Text style={styles.saudacao}>
-            {saudacaoPorHorario()}, Operador 👋
+            {saudacaoPorHorario()}, {primeiroNome} 👋
           </Text>
           <Text style={styles.titulo}>Painel de Monitoramento</Text>
           <View style={styles.subtituloLinha}>
@@ -115,6 +137,16 @@ export default function DashboardScreen({
         </LinearGradient>
 
         <View style={styles.conteudo}>
+          {(statusSync === "erro" || statusSync === "pendente") && (
+            <TouchableOpacity style={styles.bannerSync} onPress={onAbrirPerfil} activeOpacity={0.8}>
+              <Feather name="cloud-off" size={14} color={CORES.warningForeground} />
+              <Text style={styles.bannerSyncTexto}>
+                {statusSync === "erro"
+                  ? "Não foi possível sincronizar com o Firebase. Seus dados estão salvos neste aparelho."
+                  : "Há alterações aguardando envio ao Firebase."}
+              </Text>
+            </TouchableOpacity>
+          )}
           {totalTrechos === 0 ? (
             // ── Estado vazio: nenhuma ocorrência cadastrada ainda ──
             <View style={[styles.vazioCard, SOMBRA_CARD]}>
@@ -178,6 +210,22 @@ export default function DashboardScreen({
                   label="Urgentes"
                   corValor={CORES.destructive}
                   sublabel="aguardam roçada"
+                />
+              </View>
+
+              {/* ── Histórico de intervenções (resumo) ── */}
+              <Text style={[styles.secaoTitulo, { marginTop: 18 }]}>Intervenções</Text>
+              <View style={styles.linhaCards}>
+                <EstatisticaCard valor={rocadasMes} label="Roçadas/mês" sublabel="executadas neste mês" />
+                <EstatisticaCard
+                  valor={tma === null ? "—" : `${tma}d`}
+                  label="Atendimento"
+                  sublabel="tempo médio até o corte"
+                />
+                <EstatisticaCard
+                  valor={reincidentes.length}
+                  label="Reincidentes"
+                  sublabel="trechos com 2+ roçadas"
                 />
               </View>
 
@@ -311,6 +359,17 @@ const styles = StyleSheet.create({
     width: 76,
     height: 22,
   },
+  avatarIniciais: { color: "#FFFFFF", fontWeight: "800", fontSize: 13 },
+  bannerSync: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    backgroundColor: CORES.warning + "33",
+    borderRadius: 12,
+    padding: 12,
+    marginBottom: 14,
+  },
+  bannerSyncTexto: { flex: 1, fontSize: 12, color: CORES.warningForeground, lineHeight: 17 },
   sinoBotao: {
     width: 36,
     height: 36,

@@ -1,31 +1,32 @@
 """
 API de análise de vegetação — Equipe 11 / Challenge Motiva
 ─────────────────────────────────────────────────────────────
-Recebe uma foto (multipart/form-data) do app, roda uma segmentação
-de cor com OpenCV para estimar a cobertura de vegetação, e devolve
-uma altura estimada + classificação de risco.
+Pipeline:
+  1. App envia a foto (multipart/form-data) + trecho (+ clima opcional)
+  2. OpenCV segmenta o verde (HSV) e calcula a COBERTURA de vegetação
+  3. Modelos XGBoost (modelo.py) estimam a ALTURA e os DIAS até o limite
+     regulatório a partir de (cobertura, temperatura, chuva)
+  4. A API devolve altura, risco e previsão de corte
 
-Este é o ponto de partida: a segmentação de cor aqui é um substituto
-razoável e explicável para o vídeo de demonstração. A evolução natural
-é treinar o modelo XGBoost citado no desafio com um dataset real de
-(cobertura, chuva, temperatura) -> altura, e plugar a previsão aqui.
+Se os arquivos de modelo não existirem (backend/modelos/), a API cai
+automaticamente na regra fixa antiga — campo `modelo` indica qual foi usado.
 
 Rodar localmente:
     pip install -r requirements.txt
+    python treinar_modelo.py          # opcional: já há modelos versionados
     uvicorn main:app --reload --host 0.0.0.0 --port 8000
-
-O app (Expo) deve apontar EXPO_PUBLIC_API_URL para o IP da sua
-máquina na rede local (não "localhost"), por exemplo:
-    EXPO_PUBLIC_API_URL=http://192.168.0.10:8000
 """
 
 from datetime import datetime
+from typing import Optional
 
 import cv2
 import numpy as np
-from fastapi import FastAPI, File, Form, UploadFile
+from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+
+from modelo import FEATURES, carregar_modelos, classificar_risco
 
 app = FastAPI(title="API de Análise de Vegetação — Equipe 11")
 
@@ -37,6 +38,14 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+MODELO_ALTURA, MODELO_DIAS = carregar_modelos()
+
+# Clima padrão quando o app não envia (média da região no verão)
+TEMPERATURA_PADRAO_C = 27.0
+CHUVA_PADRAO_MM = 20.0
+
+TAMANHO_MAXIMO_BYTES = 10 * 1024 * 1024  # 10 MB
+
 
 class ResultadoAnalise(BaseModel):
     altura_cm: float
@@ -45,6 +54,7 @@ class ResultadoAnalise(BaseModel):
     previsao_dias_proximo_corte: int
     local: str
     analisado_em: str
+    modelo: str
 
 
 def estimar_cobertura_verde(imagem_bgr: np.ndarray) -> int:
@@ -61,50 +71,64 @@ def estimar_cobertura_verde(imagem_bgr: np.ndarray) -> int:
 
     total_pixels = mascara.shape[0] * mascara.shape[1]
     pixels_verdes = int(np.count_nonzero(mascara))
-    cobertura = round((pixels_verdes / total_pixels) * 100)
-    return cobertura
+    return round((pixels_verdes / total_pixels) * 100)
 
 
 def mapear_cobertura_para_altura(cobertura: int) -> tuple[float, str, int]:
-    """
-    Regra de mapeamento cobertura -> altura/risco.
-    Provisório: no pipeline final, isso vira uma chamada ao XGBoost
-    treinado com dados reais de altura x cobertura x clima.
-    """
+    """Regra fixa — usada apenas como plano B quando os modelos XGBoost não existem."""
     if cobertura >= 55:
-        altura = round(16 + (cobertura - 55) * 0.2, 1)
-        return altura, "alto", 0
-    elif cobertura >= 30:
-        altura = round(8 + (cobertura - 30) * 0.36, 1)
-        return altura, "medio", 4
-    else:
-        altura = round(2 + cobertura * 0.2, 1)
-        return altura, "baixo", 12
+        return round(16 + (cobertura - 55) * 0.2, 1), "alto", 0
+    if cobertura >= 30:
+        return round(8 + (cobertura - 30) * 0.36, 1), "medio", 4
+    return round(2 + cobertura * 0.2, 1), "baixo", 12
+
+
+def prever(cobertura: int, temperatura_c: float, chuva_mm: float) -> tuple[float, str, int, str]:
+    """Devolve (altura_cm, risco, dias_ate_corte, nome_do_modelo)."""
+    if MODELO_ALTURA is None or MODELO_DIAS is None:
+        altura, risco, dias = mapear_cobertura_para_altura(cobertura)
+        return altura, risco, dias, "regra"
+
+    entrada = np.array([[cobertura, temperatura_c, chuva_mm]], dtype=np.float32)
+    assert entrada.shape[1] == len(FEATURES)
+    altura = float(np.clip(MODELO_ALTURA.predict(entrada)[0], 0.5, 40))
+    dias = int(round(float(np.clip(MODELO_DIAS.predict(entrada)[0], 0, 30))))
+    altura = round(altura, 1)
+    return altura, classificar_risco(altura), dias, "xgboost"
 
 
 @app.get("/")
 def status():
-    return {"status": "ok", "servico": "API de Análise de Vegetação — Equipe 11"}
+    return {
+        "status": "ok",
+        "servico": "API de Análise de Vegetação — Equipe 11",
+        "modelo": "xgboost" if MODELO_ALTURA is not None else "regra",
+    }
 
 
 @app.post("/analisar", response_model=ResultadoAnalise)
-async def analisar(foto: UploadFile = File(...), local: str = Form(...)):
-    conteudo = await foto.read()
-    array_np = np.frombuffer(conteudo, dtype=np.uint8)
-    imagem = cv2.imdecode(array_np, cv2.IMREAD_COLOR)
+async def analisar(
+    foto: UploadFile = File(...),
+    local: str = Form(...),
+    temperatura_c: Optional[float] = Form(None),
+    chuva_mm: Optional[float] = Form(None),
+):
+    conteudo = await foto.read(TAMANHO_MAXIMO_BYTES + 1)
+    if len(conteudo) > TAMANHO_MAXIMO_BYTES:
+        raise HTTPException(status_code=413, detail="Imagem acima de 10 MB.")
 
+    imagem = cv2.imdecode(np.frombuffer(conteudo, dtype=np.uint8), cv2.IMREAD_COLOR)
     if imagem is None:
-        return {
-            "altura_cm": 0,
-            "cobertura_percentual": 0,
-            "risco": "baixo",
-            "previsao_dias_proximo_corte": 0,
-            "local": local,
-            "analisado_em": datetime.now().isoformat(),
-        }
+        # Antes devolvia zeros com HTTP 200, o que gravava uma ocorrência falsa.
+        # Com 422 o app percebe a falha e usa o fallback.
+        raise HTTPException(status_code=422, detail="Arquivo não é uma imagem válida.")
 
     cobertura = estimar_cobertura_verde(imagem)
-    altura, risco, dias = mapear_cobertura_para_altura(cobertura)
+    altura, risco, dias, modelo = prever(
+        cobertura,
+        temperatura_c if temperatura_c is not None else TEMPERATURA_PADRAO_C,
+        chuva_mm if chuva_mm is not None else CHUVA_PADRAO_MM,
+    )
 
     return {
         "altura_cm": altura,
@@ -113,4 +137,5 @@ async def analisar(foto: UploadFile = File(...), local: str = Form(...)):
         "previsao_dias_proximo_corte": dias,
         "local": local,
         "analisado_em": datetime.now().isoformat(),
+        "modelo": modelo,
     }

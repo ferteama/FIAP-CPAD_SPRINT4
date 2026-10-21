@@ -1,5 +1,11 @@
 # Documento de Testes Manuais — Sprint 3
 
+> **Versão histórica (Sprint 3).** Este documento recebeu a crítica de que os resultados obtidos
+> não descreviam o comportamento observado. Foi refeito em
+> [`testes-manuais-sprint4.md`](./testes-manuais-sprint4.md), com passos reproduzíveis e
+> registro do que realmente aconteceu em cada caso.
+
+
 **Projeto:** Drone Vision Watch — Motiva
 **Equipe:** Equipe 11
 **Disciplina:** Cross-Platform Application Development

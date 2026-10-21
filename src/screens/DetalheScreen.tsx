@@ -1,11 +1,14 @@
 import React, { useState } from "react";
 import {
   Image,
+  KeyboardAvoidingView,
   Modal,
+  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
   Text,
+  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
@@ -14,7 +17,9 @@ import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
 
 import { useOcorrencias } from "../context/OcorrenciasContext";
 import { Ocorrencia } from "../interfaces/ocorrencia";
-import { CORES, GRADIENTE_PRIMARIO, SOMBRA_CARD, SOMBRA_FAB } from "../utils/tema";
+import { CORES, GRADIENTE_PRIMARIO, RISCO_ESTILO, SOMBRA_CARD, SOMBRA_FAB } from "../utils/tema";
+import { diasDesdeUltimoCorte, historicoDoLocal } from "../utils/estatisticas";
+import { diasEntre } from "../utils/datas";
 
 type DetalheScreenProps = {
   ocorrencia: Ocorrencia;
@@ -25,8 +30,14 @@ export default function DetalheScreen({
   ocorrencia,
   onVoltar,
 }: DetalheScreenProps) {
-  const { removerOcorrencia } = useOcorrencias();
+  const { registrarCorte, intervencoes } = useOcorrencias();
   const [registrando, setRegistrando] = useState(false);
+  const [observacao, setObservacao] = useState("");
+  const [erroCorte, setErroCorte] = useState<string | null>(null);
+
+  // Histórico de roçadas já executadas neste mesmo trecho
+  const historico = historicoDoLocal(intervencoes, ocorrencia.local);
+  const diasUltimoCorte = diasDesdeUltimoCorte(intervencoes, ocorrencia.local);
   const [modalConfirmacaoVisivel, setModalConfirmacaoVisivel] = useState(false);
   const [modalSucessoVisivel, setModalSucessoVisivel] = useState(false);
 
@@ -38,16 +49,23 @@ export default function DetalheScreen({
   const codigoSetor = `${numeroKm}${direcao}`;
 
   /**
-   * Confirma a remoção: tira a ocorrência do estado global
-   * (useOcorrencias) e, por consequência, do AsyncStorage.
-   * Em seguida exibe uma confirmação visual e volta à lista.
+   * Confirma a roçada: grava uma Intervenção no histórico (com responsável,
+   * data e observação) e tira o trecho da fila ativa. O registro permanece
+   * disponível em Histórico, no Relatório e neste mesmo trecho.
    */
   async function confirmarCorte() {
     setRegistrando(true);
+    setErroCorte(null);
     try {
-      await removerOcorrencia(ocorrencia.id);
+      const registro = await registrarCorte(ocorrencia, observacao);
+      if (!registro) {
+        setErroCorte("Este trecho já teve o corte registrado.");
+        return;
+      }
       setModalConfirmacaoVisivel(false);
       setModalSucessoVisivel(true);
+    } catch {
+      setErroCorte("Não foi possível registrar o corte. Tente novamente.");
     } finally {
       setRegistrando(false);
     }
@@ -156,6 +174,52 @@ export default function DetalheScreen({
           <Text style={styles.recomendacaoTitulo}>Recomendação IA</Text>
           <Text style={styles.recomendacaoTexto}>{ocorrencia.descricao}</Text>
         </View>
+
+        {/* ── Histórico de intervenções do trecho ── */}
+        <View style={[styles.historicoCard, SOMBRA_CARD]}>
+          <View style={styles.predicaoCabecalho}>
+            <Feather name="clock" size={14} color={CORES.primary} />
+            <Text style={styles.predicaoTitulo}>Histórico do trecho</Text>
+          </View>
+
+          {historico.length === 0 ? (
+            <Text style={styles.historicoVazio}>
+              Nenhuma roçada registrada neste trecho ainda.
+            </Text>
+          ) : (
+            <>
+              <Text style={styles.historicoResumo}>
+                {historico.length} roçada{historico.length !== 1 ? "s" : ""} registrada
+                {historico.length !== 1 ? "s" : ""}
+                {diasUltimoCorte !== null
+                  ? ` · última há ${diasUltimoCorte} dia${diasUltimoCorte !== 1 ? "s" : ""}`
+                  : ""}
+              </Text>
+              {historico.slice(0, 3).map((i) => {
+                const dias = diasEntre(i.dataDeteccao, i.dataCorte);
+                return (
+                  <View key={i.id} style={styles.historicoItem}>
+                    <View
+                      style={[styles.historicoPonto, { backgroundColor: RISCO_ESTILO[i.riscoAntes].bg }]}
+                    />
+                    <View style={{ flex: 1 }}>
+                      <Text style={styles.historicoItemTitulo}>
+                        {i.dataCorte} · {i.alturaAntes} antes do corte
+                      </Text>
+                      <Text style={styles.historicoItemSub}>
+                        {i.responsavel}
+                        {dias !== null ? ` · atendido em ${dias} dia${dias !== 1 ? "s" : ""}` : ""}
+                      </Text>
+                      {i.observacao ? (
+                        <Text style={styles.historicoItemObs}>{i.observacao}</Text>
+                      ) : null}
+                    </View>
+                  </View>
+                );
+              })}
+            </>
+          )}
+        </View>
       </ScrollView>
 
       {/* ── Botão registrar corte (fixo no rodapé) ── */}
@@ -185,6 +249,10 @@ export default function DetalheScreen({
         animationType="fade"
         onRequestClose={() => setModalConfirmacaoVisivel(false)}
       >
+        <KeyboardAvoidingView
+          style={{ flex: 1 }}
+          behavior={Platform.OS === "ios" ? "padding" : undefined}
+        >
         <Pressable
           style={styles.modalFundo}
           onPress={() => !registrando && setModalConfirmacaoVisivel(false)}
@@ -196,8 +264,20 @@ export default function DetalheScreen({
             <Text style={styles.modalTitulo}>Registrar corte realizado?</Text>
             <Text style={styles.modalTexto}>
               Confirma que o corte no Trecho {ocorrencia.local} foi executado?
-              {"\n"}A ocorrência será removida da lista de monitoramento.
+              {"\n"}O trecho sai da fila de monitoramento e o corte fica salvo no histórico.
             </Text>
+
+            <TextInput
+              style={styles.modalInput}
+              placeholder="Observação (opcional) — ex.: equipe, equipamento"
+              placeholderTextColor={CORES.mutedForeground}
+              value={observacao}
+              onChangeText={setObservacao}
+              editable={!registrando}
+              multiline
+              maxLength={160}
+            />
+            {erroCorte ? <Text style={styles.modalErro}>{erroCorte}</Text> : null}
 
             <View style={styles.modalBotoes}>
               <TouchableOpacity
@@ -216,12 +296,13 @@ export default function DetalheScreen({
                 activeOpacity={0.8}
               >
                 <Text style={styles.modalBotaoConfirmarTexto}>
-                  {registrando ? "Removendo..." : "Confirmar"}
+                  {registrando ? "Registrando..." : "Confirmar"}
                 </Text>
               </TouchableOpacity>
             </View>
           </Pressable>
         </Pressable>
+        </KeyboardAvoidingView>
       </Modal>
 
       {/* ── Modal: sucesso após remover ── */}
@@ -238,7 +319,7 @@ export default function DetalheScreen({
             </View>
             <Text style={styles.modalTitulo}>Corte registrado!</Text>
             <Text style={styles.modalTexto}>
-              O setor foi atualizado e removido do monitoramento de ocorrências.
+              A roçada foi gravada no histórico e o setor saiu da fila de monitoramento.
             </Text>
 
             <TouchableOpacity
@@ -457,6 +538,53 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
 
+  historicoCard: {
+    backgroundColor: CORES.card,
+    borderRadius: 18,
+    padding: 16,
+    marginHorizontal: 20,
+    marginTop: 16,
+  },
+  historicoVazio: {
+    fontSize: 12,
+    color: CORES.mutedForeground,
+  },
+  historicoResumo: {
+    fontSize: 12,
+    fontWeight: "700",
+    color: CORES.foreground,
+    marginBottom: 10,
+  },
+  historicoItem: {
+    flexDirection: "row",
+    gap: 10,
+    paddingVertical: 8,
+    borderTopWidth: 1,
+    borderTopColor: CORES.border,
+  },
+  historicoPonto: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    marginTop: 5,
+  },
+  historicoItemTitulo: {
+    fontSize: 12,
+    fontWeight: "700",
+    color: CORES.foreground,
+  },
+  historicoItemSub: {
+    fontSize: 11,
+    color: CORES.mutedForeground,
+    marginTop: 1,
+  },
+  historicoItemObs: {
+    fontSize: 11,
+    color: CORES.foreground,
+    marginTop: 3,
+    fontStyle: "italic",
+  },
+
   rodapeFixo: {
     position: "absolute",
     bottom: 0,
@@ -518,6 +646,26 @@ const styles = StyleSheet.create({
     textAlign: "center",
     lineHeight: 20,
     marginBottom: 20,
+  },
+  modalInput: {
+    width: "100%",
+    minHeight: 56,
+    borderWidth: 1,
+    borderColor: CORES.border,
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    fontSize: 13,
+    color: CORES.foreground,
+    backgroundColor: CORES.background,
+    textAlignVertical: "top",
+    marginBottom: 12,
+  },
+  modalErro: {
+    fontSize: 12,
+    color: CORES.destructive,
+    marginBottom: 12,
+    textAlign: "center",
   },
   modalBotoes: {
     flexDirection: "row",

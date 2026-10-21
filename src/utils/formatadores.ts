@@ -8,9 +8,13 @@ export function dataHoje(): string {
   return `${dd}/${mm}/${aaaa}`;
 }
 
-export function proximoId(ids: number[]): number {
-  if (ids.length === 0) return 1;
-  return Math.max(...ids) + 1;
+/**
+ * ID único e seguro para uso offline/multi-aparelho (Firestore).
+ * Não depende de "maior id + 1", que colidiria entre dois operadores.
+ */
+export function gerarId(prefixo = "oc"): string {
+  const aleatorio = Math.random().toString(36).slice(2, 8);
+  return `${prefixo}-${Date.now().toString(36)}-${aleatorio}`;
 }
 
 export function alturaEstimada(risco: NivelRisco): string {
@@ -49,4 +53,17 @@ export function climaSimulado(): string {
   const temperaturas = [25, 26, 27, 28, 29, 30, 31];
   const valor = temperaturas[Math.floor(Math.random() * temperaturas.length)];
   return `${valor}°C`;
+}
+
+/**
+ * Sentido da pista a partir do número do KM (regra do protótipo: par = Norte,
+ * ímpar = Sul). Centralizada aqui para o cadastro e os dados de demonstração
+ * gerarem sempre o mesmo nome de trecho — é o que liga a ocorrência ao seu histórico.
+ */
+export function direcaoDoKm(km: number): "Norte" | "Sul" {
+  return km % 2 === 0 ? "Norte" : "Sul";
+}
+
+export function nomeDoTrecho(km: number): string {
+  return `KM ${km} — ${direcaoDoKm(km)}`;
 }

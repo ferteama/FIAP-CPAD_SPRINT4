@@ -1,5 +1,7 @@
 import { Ocorrencia } from "../interfaces/ocorrencia";
+import { Intervencao } from "../interfaces/intervencao";
 import { NivelRisco } from "../types/nivelRisco";
+import { diasEntre, diasDesde, parseDataBR } from "./datas";
 
 /**
  * estatisticas.ts
@@ -78,8 +80,10 @@ export function trechosPrioritarios(
 }
 
 /** Conta quantas ocorrências foram registradas no mês corrente (mm/aaaa de o.data). */
-export function vistoriasNoMes(ocorrencias: Ocorrencia[]): number {
-  const hoje = new Date();
+export function vistoriasNoMes(
+  ocorrencias: Ocorrencia[],
+  hoje: Date = new Date()
+): number {
   const mesAtual = String(hoje.getMonth() + 1).padStart(2, "0");
   const anoAtual = String(hoje.getFullYear());
   return ocorrencias.filter((o) => {
@@ -87,3 +91,83 @@ export function vistoriasNoMes(ocorrencias: Ocorrencia[]): number {
     return partes.length === 3 && partes[1] === mesAtual && partes[2] === anoAtual;
   }).length;
 }
+
+// ─────────────────────────────────────────────────────────────
+// Histórico de intervenções (roçadas executadas)
+// ─────────────────────────────────────────────────────────────
+
+/** Intervenções executadas no mês corrente (pela data do corte). */
+export function intervencoesNoMes(
+  intervencoes: Intervencao[],
+  hoje: Date = new Date()
+): number {
+  const mes = String(hoje.getMonth() + 1).padStart(2, "0");
+  const ano = String(hoje.getFullYear());
+  return intervencoes.filter((i) => {
+    const p = i.dataCorte.split("/");
+    return p.length === 3 && p[1] === mes && p[2] === ano;
+  }).length;
+}
+
+/**
+ * Tempo médio de atendimento: dias entre a detecção da ocorrência e o corte.
+ * É o indicador central do problema da Motiva (rapidez de resposta).
+ * Retorna null quando não há dados válidos.
+ */
+export function tempoMedioAtendimentoDias(
+  intervencoes: Intervencao[]
+): number | null {
+  const dias = intervencoes
+    .map((i) => diasEntre(i.dataDeteccao, i.dataCorte))
+    .filter((d): d is number => d !== null && d >= 0);
+  if (dias.length === 0) return null;
+  const media = dias.reduce((a, b) => a + b, 0) / dias.length;
+  return Math.round(media * 10) / 10;
+}
+
+/** Mantém só as intervenções dos últimos `dias` dias (null = sem filtro). */
+export function filtrarPorPeriodo(
+  intervencoes: Intervencao[],
+  dias: number | null,
+  hoje: Date = new Date()
+): Intervencao[] {
+  if (dias === null) return intervencoes;
+  return intervencoes.filter((i) => {
+    const d = diasDesde(i.dataCorte, hoje);
+    return d !== null && d <= dias;
+  });
+}
+
+/** Histórico de um trecho específico, do mais recente para o mais antigo. */
+export function historicoDoLocal(
+  intervencoes: Intervencao[],
+  local: string
+): Intervencao[] {
+  return intervencoes
+    .filter((i) => i.local === local)
+    .sort((a, b) => b.timestamp - a.timestamp);
+}
+
+/** Trechos que já receberam 2+ roçadas — candidatos a manejo diferenciado. */
+export function trechosReincidentes(
+  intervencoes: Intervencao[]
+): { local: string; total: number }[] {
+  const mapa = new Map<string, number>();
+  intervencoes.forEach((i) => mapa.set(i.local, (mapa.get(i.local) ?? 0) + 1));
+  return [...mapa.entries()]
+    .filter(([, total]) => total >= 2)
+    .map(([local, total]) => ({ local, total }))
+    .sort((a, b) => b.total - a.total);
+}
+
+/** Dias desde a última roçada de um trecho (null se nunca foi cortado). */
+export function diasDesdeUltimoCorte(
+  intervencoes: Intervencao[],
+  local: string,
+  hoje: Date = new Date()
+): number | null {
+  const ultimo = historicoDoLocal(intervencoes, local)[0];
+  return ultimo ? diasDesde(ultimo.dataCorte, hoje) : null;
+}
+
+export { parseDataBR };

@@ -17,6 +17,7 @@ import { Feather } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
 
 import { useOcorrencias } from "../context/OcorrenciasContext";
+import { useConfigDemo } from "../context/ConfigDemoContext";
 import { NivelRisco } from "../types/nivelRisco";
 import { CORES, COR_RISCO, GRADIENTE_PRIMARIO, LABEL_RISCO, SOMBRA_CARD, SOMBRA_FAB } from "../utils/tema";
 import {
@@ -25,6 +26,7 @@ import {
   dataHoje,
   descricaoSugerida,
   distanciaSimulada,
+  nomeDoTrecho,
   previsaoCorte,
 } from "../utils/formatadores";
 import {
@@ -36,13 +38,8 @@ import {
 // ── Locais disponíveis (km das rodovias monitoradas) ──
 
 const LOCAIS_DISPONIVEIS = [
-  "KM 10",
-  "KM 20",
-  "KM 28",
-  "KM 35",
-  "KM 42",
-  "KM 55",
-  "KM 67",
+  "KM 5", "KM 10", "KM 12", "KM 19", "KM 22", "KM 28", "KM 33", "KM 37", "KM 42",
+  "KM 48", "KM 55", "KM 60", "KM 64", "KM 67", "KM 71", "KM 75", "KM 81", "KM 90",
 ];
 
 const NIVEIS_RISCO: { valor: NivelRisco; label: string }[] = [
@@ -61,6 +58,7 @@ export default function CadastroScreen({
   onSucesso,
 }: CadastroScreenProps) {
   const { adicionarOcorrencia } = useOcorrencias();
+  const { simularApiOffline } = useConfigDemo();
 
   // ── Estado do formulário ──
   const [local, setLocal] = useState("KM 10");
@@ -141,56 +139,62 @@ export default function CadastroScreen({
   }
 
   async function handleEnviar() {
-    // Sem foto: exige classificação manual (fluxo original, sem IA).
+    // Sem foto: exige classificação manual (fluxo sem IA).
     // Com foto: a classificação vem da análise de visão computacional.
     if (!fotoUri && !risco) {
       Alert.alert("Atenção", "Selecione uma classificação de risco ou anexe uma foto.");
       return;
     }
 
-    // Deduz "Norte" ou "Sul" — alterna conforme paridade do número do KM
-    const numeroKm = parseInt(local.replace("KM ", ""), 10);
-    const direcao = numeroKm % 2 === 0 ? "Norte" : "Sul";
-    const localCompleto = `${local} — ${direcao}`;
+    // Sentido da pista deduzido do KM (mesma regra dos dados de demonstração)
+    const localCompleto = nomeDoTrecho(parseInt(local.replace("KM ", ""), 10));
 
     setEnviando(true);
     try {
       if (fotoUri) {
-        // ── Fluxo com foto: análise real via API (OpenCV) ──
+        // ── Fluxo com foto: análise real via API (OpenCV + XGBoost) ──
         setStatusEnvio("analisando");
+        let resultado;
+        let origem: "api" | "offline" = "api";
         try {
-          const resultado = await analisarFotoVegetacao(fotoUri, localCompleto);
-          await adicionarOcorrencia({
-            local: localCompleto,
-            descricao: `Análise por visão computacional: altura estimada ${resultado.alturaCm}cm (cobertura ${resultado.coberturaPercentual}%).`,
-            risco: resultado.risco,
-            data: dataHoje(),
-            alturaGrama: `${resultado.alturaCm}cm`,
-            distancia: distanciaSimulada(),
-            previsaoCorte: `${resultado.previsaoDiasProximoCorte} dia(s)`,
-            clima: climaSimulado(),
-            fotoUri,
+          resultado = await analisarFotoVegetacao(fotoUri, localCompleto, {
+            simularFalha: simularApiOffline,
           });
         } catch (err) {
-          // API indisponível (ex: backend fora do ar) — cai no modo
-          // simulado em vez de travar o cadastro do operador.
+          // API indisponível — cai no modo simulado em vez de travar o operador.
           if (!(err instanceof VegetationApiError)) throw err;
-
-          const resultadoSimulado = analisarFotoVegetacaoSimulado();
-          await adicionarOcorrencia({
-            local: localCompleto,
-            descricao: `[modo offline] Altura estimada ${resultadoSimulado.alturaCm}cm (cobertura ${resultadoSimulado.coberturaPercentual}%). API de análise indisponível no momento.`,
-            risco: resultadoSimulado.risco,
-            data: dataHoje(),
-            alturaGrama: `${resultadoSimulado.alturaCm}cm`,
-            distancia: distanciaSimulada(),
-            previsaoCorte: `${resultadoSimulado.previsaoDiasProximoCorte} dia(s)`,
-            clima: climaSimulado(),
-            fotoUri,
-          });
+          resultado = analisarFotoVegetacaoSimulado();
+          origem = "offline";
         }
+
+        const rotuloModelo = resultado.modelo === "xgboost" ? "modelo XGBoost" : "visão computacional";
+        await adicionarOcorrencia({
+          local: localCompleto,
+          descricao:
+            origem === "api"
+              ? `Análise por ${rotuloModelo}: altura estimada ${resultado.alturaCm}cm (cobertura ${resultado.coberturaPercentual}%).`
+              : `[modo offline] Altura estimada ${resultado.alturaCm}cm (cobertura ${resultado.coberturaPercentual}%). API de análise indisponível no momento — reanalisar quando houver conexão.`,
+          risco: resultado.risco,
+          data: dataHoje(),
+          alturaGrama: `${resultado.alturaCm}cm`,
+          distancia: distanciaSimulada(),
+          previsaoCorte:
+            resultado.previsaoDiasProximoCorte <= 0
+              ? "Hoje"
+              : `${resultado.previsaoDiasProximoCorte} dia(s)`,
+          clima: climaSimulado(),
+          fotoUri,
+          origem,
+        });
+
+        Alert.alert(
+          origem === "api" ? "Enviado!" : "Salvo em modo offline",
+          origem === "api"
+            ? "Registro analisado e enviado para monitoramento."
+            : "A API não respondeu. O registro foi salvo com uma estimativa simulada."
+        );
       } else {
-        // ── Fluxo sem foto: classificação manual (como antes) ──
+        // ── Fluxo sem foto: classificação manual ──
         setStatusEnvio("enviando");
         await adicionarOcorrencia({
           local: localCompleto,
@@ -201,10 +205,11 @@ export default function CadastroScreen({
           distancia: distanciaSimulada(),
           previsaoCorte: previsaoCorte(risco as NivelRisco),
           clima: climaSimulado(),
+          origem: "manual",
         });
+        Alert.alert("Enviado!", "Registro enviado para monitoramento.");
       }
 
-      Alert.alert("Enviado!", "Registro enviado para monitoramento.");
       onSucesso();
     } finally {
       setEnviando(false);
