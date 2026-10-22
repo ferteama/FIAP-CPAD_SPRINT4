@@ -10,7 +10,7 @@
  * aparelho que tirou a foto. (Evolução: Firebase Storage.)
  */
 
-import { collection, doc, getDocs, setDoc } from "firebase/firestore";
+import { collection, deleteDoc, doc, getDocs, setDoc } from "firebase/firestore";
 
 import { Ocorrencia } from "../interfaces/ocorrencia";
 import { Intervencao } from "../interfaces/intervencao";
@@ -29,6 +29,14 @@ export async function buscarOcorrencias(): Promise<Ocorrencia[]> {
 export async function salvarOcorrencia(o: Ocorrencia): Promise<void> {
   const { fotoUri: _fotoLocal, ...dados } = o;
   await setDoc(doc(exigirDb(), "ocorrencias", o.id), dados);
+}
+
+/**
+ * Apaga a postagem (trecho em monitoramento) quando a roçada é registrada.
+ * O registro permanente do corte fica em `intervencoes` — nada do histórico se perde.
+ */
+export async function excluirOcorrencia(id: string): Promise<void> {
+  await deleteDoc(doc(exigirDb(), "ocorrencias", id));
 }
 
 export async function buscarIntervencoes(): Promise<Intervencao[]> {

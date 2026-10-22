@@ -23,6 +23,11 @@ describe("criarIntervencao (registrar corte)", () => {
     expect(criarIntervencao(oc, "Maria", undefined, agora).observacao).toBeUndefined();
   });
 
+  test("corte de trecho de demonstração fica marcado como mock (não vai ao Firestore)", () => {
+    expect(criarIntervencao({ ...oc, origem: "mock" }, "Maria", undefined, agora).origem).toBe("mock");
+    expect(criarIntervencao({ ...oc, origem: "manual" }, "Maria", undefined, agora).origem).toBe("app");
+  });
+
   test("responsável em branco cai em 'Operador' e IDs não se repetem", () => {
     const a = criarIntervencao(oc, "  ", undefined, agora);
     const b = criarIntervencao(oc, "  ", undefined, agora);

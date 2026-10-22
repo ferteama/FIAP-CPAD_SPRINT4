@@ -25,6 +25,7 @@ export function criarIntervencao(
     timestamp: agora.getTime(),
     responsavel: responsavel.trim() || "Operador",
     observacao: obs ? obs : undefined,
-    origem: "app",
+    // Cortar um trecho de demonstração não deve poluir o banco real
+    origem: ocorrencia.origem === "mock" ? "mock" : "app",
   };
 }

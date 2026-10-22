@@ -27,6 +27,15 @@ describe("mesclarOcorrencias", () => {
     expect(paraEnviar).toEqual([]);
   });
 
+  test("postagem já roçada que ainda existe no Firestore entra na lista de exclusão remota", () => {
+    const { paraExcluirRemoto } = mesclarOcorrencias([], [oc("a"), oc("b")], [iv("i1", "a")]);
+    expect(paraExcluirRemoto.map((o) => o.id)).toEqual(["a"]);
+  });
+
+  test("sem intervenção nada é excluído do Firestore", () => {
+    expect(mesclarOcorrencias([oc("a")], [oc("a")], []).paraExcluirRemoto).toEqual([]);
+  });
+
   test("preserva a foto local ao receber a versão remota", () => {
     const { resultado } = mesclarOcorrencias([oc("a", { fotoUri: "file:///x.jpg" })], [oc("a", { risco: "alto" })], []);
     expect(resultado[0].fotoUri).toBe("file:///x.jpg");

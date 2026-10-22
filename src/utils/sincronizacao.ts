@@ -12,6 +12,7 @@ import { parseDataBR } from "./datas";
  *    intervenção já foi roçada e não volta para a lista ativa, mesmo que
  *    outro aparelho ainda a tenha em cache.
  *  - Dados de demonstração (origem "mock") nunca são enviados ao Firestore.
+ *  - Ao registrar o corte, a postagem é APAGADA do Firestore; o histórico (intervencoes) permanece.
  */
 
 export function mesclarIntervencoes(
@@ -33,7 +34,7 @@ export function mesclarOcorrencias(
   locais: Ocorrencia[],
   remotas: Ocorrencia[],
   intervencoes: Intervencao[]
-): { resultado: Ocorrencia[]; paraEnviar: Ocorrencia[] } {
+): { resultado: Ocorrencia[]; paraEnviar: Ocorrencia[]; paraExcluirRemoto: Ocorrencia[] } {
   const resolvidas = new Set(intervencoes.map((i) => i.ocorrenciaId));
   const idsRemotos = new Set(remotas.map((o) => o.id));
 
@@ -57,5 +58,9 @@ export function mesclarOcorrencias(
       (parseDataBR(b.data)?.getTime() ?? 0) - (parseDataBR(a.data)?.getTime() ?? 0)
   );
 
-  return { resultado, paraEnviar };
+  // Postagens que ainda existem no Firestore, mas já foram roçadas (têm intervenção):
+  // devem ser apagadas de lá — acontece quando a exclusão falhou offline ou veio de outro aparelho.
+  const paraExcluirRemoto = remotas.filter((o) => resolvidas.has(o.id));
+
+  return { resultado, paraEnviar, paraExcluirRemoto };
 }

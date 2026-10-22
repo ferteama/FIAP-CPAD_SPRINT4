@@ -51,7 +51,15 @@ export function traduzirErroAuth(codigo: string | undefined): string {
       return "Login por e-mail/senha não está habilitado no Firebase do projeto.";
     case "auth/user-disabled":
       return "Esta conta foi desativada.";
+    case "auth/configuration-not-found":
+      return "O Authentication ainda não foi ativado no projeto Firebase (Console → Authentication → Começar).";
+    case "auth/invalid-api-key":
+    case "auth/api-key-not-valid.-please-pass-a-valid-api-key.":
+      return "Chave de API do Firebase inválida. Confira as variáveis EXPO_PUBLIC_FIREBASE_* do build.";
+    case "app/firebase-off":
+      return "O Firebase não inicializou neste build. Confira as variáveis EXPO_PUBLIC_FIREBASE_*.";
     default:
-      return "Não foi possível concluir. Tente novamente.";
+      // Inclui o código para o erro ser diagnosticável (antes ficava escondido)
+      return `Não foi possível concluir. Tente novamente.${codigo ? ` (${codigo})` : ""}`;
   }
 }

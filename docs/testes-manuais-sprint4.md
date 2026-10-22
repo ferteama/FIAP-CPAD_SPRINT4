@@ -26,7 +26,7 @@ Não substituem os testes manuais abaixo — cobrem só lógica pura e build.
 | Verificação | Comando | Resultado |
 |---|---|---|
 | Tipagem estrita (TypeScript) | `npm run typecheck` | sem erros |
-| Testes unitários do app (7 suítes, 49 testes: datas, estatísticas, histórico de intervenções, mesclagem de sincronização, validação de login, exportação CSV/HTML, consistência dos mocks) | `npm test` | 49 passaram |
+| Testes unitários do app (7 suítes, 52 testes: datas, estatísticas, histórico de intervenções, mesclagem de sincronização, validação de login, exportação CSV/HTML, consistência dos mocks) | `npm test` | 52 passaram |
 | Testes da API (7 testes: cobertura, relação cobertura→altura, efeito do clima, contrato JSON, imagem inválida → 422, campo obrigatório) | `cd backend && pytest -q` | 7 passaram |
 | Bundle do app | `npx expo export --platform web` e `--platform android` | ambos geram o bundle |
 
@@ -56,7 +56,7 @@ Preencher *Resultado obtido* e marcar o status. Prioridade **A** = obrigatório 
 | T11 | A | **Falha simulada.** Perfil → ligar "Simular API offline" → repetir T09 com a API **ligada**. | Mesmo resultado de T10 (falha imediata). Desligar a chave volta ao normal. | | ☐ Passou ☐ Falhou |
 | T12 | A | **Sem foto e sem risco.** Vistoria → só escolher o KM → Enviar. | Alerta "Selecione uma classificação de risco ou anexe uma foto."; nada é criado. | | ☐ Passou ☐ Falhou |
 | T13 | A | **Sem foto, com risco.** Escolher KM e risco "Alto" → Enviar. | Trecho criado com risco alto, sem etiqueta de IA; Início atualiza contagens. | | ☐ Passou ☐ Falhou |
-| T14 | A | **Registrar corte (histórico).** Trechos → abrir um trecho → "Registrar corte realizado" → escrever observação → Confirmar. | Modal de sucesso; trecho **some** de Trechos e do Início; **aparece em Histórico** com data, responsável (seu nome), "atendida em N dias" e a observação; Relatório: "Roçadas no mês" +1. | | ☐ Passou ☐ Falhou |
+| T14 | A | **Registrar corte (histórico).** Trechos → abrir um trecho → "Registrar corte realizado" → escrever observação → Confirmar. | Modal de sucesso; trecho **some** de Trechos e do Início; **aparece em Histórico** com data, responsável (seu nome), "atendida em N dias" e a observação; Relatório: "Roçadas no mês" +1. **Com Firebase:** no Console, o documento do trecho **some** de `ocorrencias` e surge um novo em `intervencoes`. | | ☐ Passou ☐ Falhou |
 | T15 | A | **Histórico por trecho.** Cadastrar nova vistoria em um KM que já teve corte (ex.: KM 42 no cenário "Dados completos") e abrir o detalhe. | Cartão "Histórico do trecho" lista as roçadas anteriores e "última há N dias". Trecho sem corte mostra "Nenhuma roçada registrada…". | | ☐ Passou ☐ Falhou |
 | T16 | B | **Toque duplo no corte.** Confirmar o corte tocando rapidamente 2×. | Apenas **uma** intervenção é criada. | | ☐ Passou ☐ Falhou |
 | T17 | A | **Filtros.** Trechos → "Urgente" (e de novo para limpar), "Por KM", "Perto de Mim". | Urgente: só risco alto; Por KM: ordem crescente; Perto de Mim: menor distância primeiro; tocar de novo remove o filtro. | | ☐ Passou ☐ Falhou |
@@ -85,7 +85,7 @@ Preencher *Resultado obtido* e marcar o status. Prioridade **A** = obrigatório 
 | T25 | A | **Trecho entre aparelhos.** A: criar trecho. B: entrar com **outra** conta → Perfil → "Sincronizar agora". | O trecho criado em A aparece em B (sem a foto — limitação conhecida). Perfil: "Sincronizado com o Firebase". Console: documento em `ocorrencias`. | | ☐ Passou ☐ Falhou |
 | T26 | A | **Corte entre aparelhos.** B: registrar corte do trecho de T25. A: "Sincronizar agora". | Em A, o trecho **sai** da fila e o corte aparece no Histórico. | | ☐ Passou ☐ Falhou |
 | T27 | A | **Offline com Firebase.** Modo avião → criar trecho → voltar a rede → "Sincronizar agora". | Trecho criado normalmente; faixa amarela de pendência no Início; após sincronizar, a faixa some e o documento aparece no Console. | | ☐ Passou ☐ Falhou |
-| T28 | B | **Regras do Firestore.** Tentar (pelo Console/Playground) apagar uma `intervencoes/{id}` ou ler sem login. | Negado pelas regras. | | ☐ Passou ☐ Falhou |
+| T28 | B | **Regras do Firestore.** Tentar (pelo Console/Playground) apagar uma `intervencoes/{id}` ou ler sem login. | Negado pelas regras (apagar `ocorrencias/{id}` estando logado é permitido). | | ☐ Passou ☐ Falhou |
 
 ### 3.6 APK final
 

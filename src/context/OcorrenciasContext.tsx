@@ -19,6 +19,7 @@ import { firebaseConfigurado } from "../services/firebase";
 import {
   buscarIntervencoes,
   buscarOcorrencias,
+  excluirOcorrencia,
   salvarIntervencao,
   salvarOcorrencia,
 } from "../services/firestoreService";
@@ -75,10 +76,10 @@ export function OcorrenciasProvider({ children }: { children: React.ReactNode })
       setIntervencoes(iv.resultado);
       setOcorrencias(oc.resultado);
 
-      await Promise.all([
-        ...iv.paraEnviar.map(salvarIntervencao),
-        ...oc.paraEnviar.map(salvarOcorrencia),
-      ]);
+      // 1º o histórico (nunca se perde), 2º as postagens novas, 3º apaga as já roçadas
+      await Promise.all(iv.paraEnviar.map(salvarIntervencao));
+      await Promise.all(oc.paraEnviar.map(salvarOcorrencia));
+      await Promise.all(oc.paraExcluirRemoto.map((o) => excluirOcorrencia(o.id)));
       setStatusSync("ok");
       setUltimaSync(Date.now());
     } catch (e) {
@@ -157,8 +158,12 @@ export function OcorrenciasProvider({ children }: { children: React.ReactNode })
 
       setIntervencoes((prev) => [intervencao, ...prev]);
       setOcorrencias((prev) => prev.filter((o) => o.id !== ocorrencia.id));
-      if (remotoAtivo) {
-        salvarIntervencao(intervencao).catch(() => setStatusSync("pendente"));
+      // Remoto: grava o histórico e, só depois, apaga a postagem. Se falhar (offline),
+      // a próxima sincronização refaz — a intervenção local é a "lápide" da postagem.
+      if (remotoAtivo && intervencao.origem !== "mock") {
+        salvarIntervencao(intervencao)
+          .then(() => excluirOcorrencia(ocorrencia.id))
+          .catch(() => setStatusSync("pendente"));
       }
       return intervencao;
     },

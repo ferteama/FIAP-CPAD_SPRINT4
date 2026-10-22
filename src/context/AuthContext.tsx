@@ -46,6 +46,7 @@ async function comMensagemAmigavel<T>(fn: () => Promise<T>): Promise<T> {
   try {
     return await fn();
   } catch (e: any) {
+    console.warn("[auth] erro:", e?.code ?? "", e?.message ?? e);
     throw new Error(traduzirErroAuth(e?.code));
   }
 }

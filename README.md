@@ -7,26 +7,26 @@
 
 ## Integrantes
 
-| Nome                           | RM       |
-| ------------------------------ | -------- |
-| Auro Vanetti                   | RM563761 |
-| Enzo H. K. Nishida             | RM565052 |
-| Renan Mano Otero               | RM554911 |
+| Nome | RM |
+|------|----|
+| Auro Vanetti | RM563761 |
+| Enzo H. K. Nishida | RM565052 |
+| Renan Mano Otero | RM554911 |
 | Marco Antonio Ferreira Fonseca | RM566434 |
-| Bruno Soares de Santanna       | RM562235 |
-| Enzo Yokokura Araujo           | RM564177 |
+| Bruno Soares de Santanna | RM562235 |
+| Enzo Yokokura Araujo | RM564177 |
 
 ---
 
 ## Links da entrega
 
-| Item                                                 | Link                                                                 |
-| ---------------------------------------------------- | -------------------------------------------------------------------- |
-| 📱 APK final (Android)                               | _(colar o link do Google Drive / GitHub Releases após `eas build`)_  |
-| 🎬 Vídeo de pitch e demonstração (Sprint 4, ≤ 5 min) | _(colar o link do YouTube não listado)_                              |
-| 🎬 Vídeo de demonstração (Sprint 3)                  | https://youtu.be/4RbNBSrX2F0                                         |
-| 💼 Plano de negócio                                  | [`docs/plano-de-negocio.docx`](./docs/plano-de-negocio.docx)         |
-| 🧪 Documento de testes manuais                       | [`docs/testes-manuais-sprint4.md`](./docs/testes-manuais-sprint4.md) |
+| Item | Link |
+|------|------|
+| 📱 APK final (Android) | _(colar o link do Google Drive / GitHub Releases após `eas build`)_ |
+| 🎬 Vídeo de pitch e demonstração (Sprint 4, ≤ 5 min) | _(colar o link do YouTube não listado)_ |
+| 🎬 Vídeo de demonstração (Sprint 3) | https://youtu.be/4RbNBSrX2F0 |
+| 💼 Plano de negócio | [`docs/plano-de-negocio.docx`](./docs/plano-de-negocio.docx) |
+| 🧪 Documento de testes manuais | [`docs/testes-manuais-sprint4.md`](./docs/testes-manuais-sprint4.md) |
 
 ---
 
@@ -49,30 +49,30 @@ foto (campo ou drone) → OpenCV mede a cobertura de vegetação → XGBoost est
 
 ### Navegação
 
-| Aba              | Tela              | O que faz                                                                                           |
-| ---------------- | ----------------- | --------------------------------------------------------------------------------------------------- |
-| Início           | `DashboardScreen` | Métricas, ranking de altura por trecho, prioridade máxima, conformidade, indicadores de intervenção |
-| Trechos          | `ListaScreen`     | Fila de ocorrências com filtros Urgente / Perto de Mim / Por KM                                     |
-| Vistoria         | `CadastroScreen`  | Nova ocorrência: foto (análise automática) ou classificação manual                                  |
-| Histórico        | `HistoricoScreen` | Todas as roçadas executadas, com filtro de período e tempo de atendimento                           |
-| Relatório        | `RelatorioScreen` | Resumo, tabela por trecho, histórico e **exportação PDF/CSV**                                       |
-| _(sem aba)_      | `DetalheScreen`   | Detalhe do trecho, histórico do trecho e **registro de corte**                                      |
-| _(avatar)_       | `PerfilScreen`    | Conta, sincronização, cenários de demonstração, sair                                                |
-| _(antes do app)_ | `LoginScreen`     | Entrar, criar conta, recuperar senha (Firebase Auth)                                                |
+| Aba | Tela | O que faz |
+|-----|------|-----------|
+| Início | `DashboardScreen` | Métricas, ranking de altura por trecho, prioridade máxima, conformidade, indicadores de intervenção |
+| Trechos | `ListaScreen` | Fila de ocorrências com filtros Urgente / Perto de Mim / Por KM |
+| Vistoria | `CadastroScreen` | Nova ocorrência: foto (análise automática) ou classificação manual |
+| Histórico | `HistoricoScreen` | Todas as roçadas executadas, com filtro de período e tempo de atendimento |
+| Relatório | `RelatorioScreen` | Resumo, tabela por trecho, histórico e **exportação PDF/CSV** |
+| _(sem aba)_ | `DetalheScreen` | Detalhe do trecho, histórico do trecho e **registro de corte** |
+| _(avatar)_ | `PerfilScreen` | Conta, sincronização, cenários de demonstração, sair |
+| _(antes do app)_ | `LoginScreen` | Entrar, criar conta, recuperar senha (Firebase Auth) |
 
 ---
 
 ## Stack
 
-| Camada             | Tecnologia                                                                            |
-| ------------------ | ------------------------------------------------------------------------------------- |
-| App                | React Native + **Expo** (SDK 56), TypeScript estrito, Context API                     |
-| Autenticação       | **Firebase Authentication** (e-mail/senha, sessão persistida com AsyncStorage)        |
-| Banco de dados     | **Cloud Firestore** (equipe compartilhada) + **AsyncStorage** (cache offline)         |
-| Exportação         | `expo-print` (PDF), `expo-file-system` + `expo-sharing` (CSV)                         |
+| Camada | Tecnologia |
+|--------|-----------|
+| App | React Native + **Expo** (SDK 56), TypeScript estrito, Context API |
+| Autenticação | **Firebase Authentication** (e-mail/senha, sessão persistida com AsyncStorage) |
+| Banco de dados | **Cloud Firestore** (equipe compartilhada) + **AsyncStorage** (cache offline) |
+| Exportação | `expo-print` (PDF), `expo-file-system` + `expo-sharing` (CSV) |
 | Backend de análise | **FastAPI** + **OpenCV** (segmentação HSV) + **XGBoost** (altura e dias até o limite) |
-| Build              | **EAS Build** (APK)                                                                   |
-| Testes             | Jest + ts-jest (app), pytest (API)                                                    |
+| Build | **EAS Build** (APK) |
+| Testes | Jest + ts-jest (app), pytest (API) |
 
 ### Por que continuamos em React Native/Expo (e não migramos para Flutter)
 
@@ -85,23 +85,23 @@ O Expo também entrega o APK via EAS sem configurar o Android Studio e permite t
 
 ## Resumo das entregas por Sprint
 
-| Sprint | Entrega                                                                                                                                                                                                             |
-| ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1      | Protótipo navegável (HTML/JS) com cinco abas e identidade visual Motiva                                                                                                                                             |
-| 2      | App Expo com dados mockados, cadastro com foto, detalhe e persistência local; backend FastAPI + OpenCV                                                                                                              |
-| 3      | Dashboard com métricas e ranking, navegação por abas, relatório consolidado, filtros funcionais, análise de foto plugada no cadastro com _fallback_ offline, funções estatísticas puras                             |
-| 4      | **Login/cadastro com Firebase + sincronização Firestore**, **histórico de intervenções**, **modelo XGBoost**, **exportação PDF/CSV**, mocks ampliados com cenários, testes automatizados, EAS/APK, plano de negócio |
+| Sprint | Entrega |
+|--------|---------|
+| 1 | Protótipo navegável (HTML/JS) com cinco abas e identidade visual Motiva |
+| 2 | App Expo com dados mockados, cadastro com foto, detalhe e persistência local; backend FastAPI + OpenCV |
+| 3 | Dashboard com métricas e ranking, navegação por abas, relatório consolidado, filtros funcionais, análise de foto plugada no cadastro com *fallback* offline, funções estatísticas puras |
+| 4 | **Login/cadastro com Firebase + sincronização Firestore**, **histórico de intervenções**, **modelo XGBoost**, **exportação PDF/CSV**, mocks ampliados com cenários, testes automatizados, EAS/APK, plano de negócio |
 
 ---
 
 ## Como a Sprint 4 respondeu ao feedback da Sprint 3
 
-| Feedback do professor                                                    | O que foi feito                                                                                                                                                                                                                                                                         |
-| ------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Documento de testes "preenchido estaticamente", com resultados genéricos | Refeito em [`docs/testes-manuais-sprint4.md`](./docs/testes-manuais-sprint4.md): 29 casos com passos reproduzíveis e coluna para **o que de fato foi observado**, ambiente do teste e tabela de defeitos/correções. Separado do que é verificação automática (49 testes Jest, 7 pytest) |
-| Mocks com só 4 ocorrências                                               | 18 ocorrências + 14 intervenções, datas relativas a "hoje" e **3 cenários** selecionáveis em _Perfil_ (completo, muitos críticos, lista vazia) + chave **"Simular API offline"** para demonstrar o estado de erro                                                                       |
-| "Registrar corte" só apagava a ocorrência                                | Agora cria uma **Intervenção** (responsável, datas, altura antes, observação) que nunca é apagada: aparece em _Histórico_, no detalhe do trecho, no Relatório e alimenta o **tempo médio de atendimento** e a **reincidência por trecho**                                               |
-| Pasta `.expo` versionada                                                 | Removida e adicionada ao `.gitignore` (veja o comando abaixo para tirar do histórico do seu clone)                                                                                                                                                                                      |
+| Feedback do professor | O que foi feito |
+|-----------------------|-----------------|
+| Documento de testes "preenchido estaticamente", com resultados genéricos | Refeito em [`docs/testes-manuais-sprint4.md`](./docs/testes-manuais-sprint4.md): 29 casos com passos reproduzíveis e coluna para **o que de fato foi observado**, ambiente do teste e tabela de defeitos/correções. Separado do que é verificação automática (52 testes Jest, 7 pytest) |
+| Mocks com só 4 ocorrências | 18 ocorrências + 14 intervenções, datas relativas a "hoje" e **3 cenários** selecionáveis em *Perfil* (completo, muitos críticos, lista vazia) + chave **"Simular API offline"** para demonstrar o estado de erro |
+| "Registrar corte" só apagava a ocorrência | Agora cria uma **Intervenção** (responsável, datas, altura antes, observação) que nunca é apagada: aparece em *Histórico*, no detalhe do trecho, no Relatório e alimenta o **tempo médio de atendimento** e a **reincidência por trecho** |
+| Pasta `.expo` versionada | Removida e adicionada ao `.gitignore` (veja o comando abaixo para tirar do histórico do seu clone) |
 
 Se o `.expo` ainda aparecer no seu repositório remoto:
 
@@ -115,19 +115,19 @@ git push
 
 ## Funcionalidades
 
-| Requisito                                                             | Status | Onde                                                            |
-| --------------------------------------------------------------------- | ------ | --------------------------------------------------------------- |
-| Login, criar conta, recuperar senha, sair                             | ✅     | `LoginScreen`, `AuthContext`, `services/authService.ts`         |
-| Sessão persistente e modo demonstração (sem Firebase)                 | ✅     | `services/firebase.ts`                                          |
-| Sincronização offline-first com Firestore                             | ✅     | `OcorrenciasContext`, `utils/sincronizacao.ts`                  |
-| Dashboard (status, ranking, conformidade, indicadores de intervenção) | ✅     | `DashboardScreen`, `utils/estatisticas.ts`                      |
-| Cadastro com foto → análise → classificação; fallback offline         | ✅     | `CadastroScreen`, `services/vegetationApi.ts` (timeout de 15 s) |
-| Modelo XGBoost (altura e dias até o limite)                           | ✅ ¹   | `backend/modelo.py`, `treinar_modelo.py`                        |
-| Registro de corte com histórico de intervenções                       | ✅     | `DetalheScreen`, `utils/intervencoes.ts`, `HistoricoScreen`     |
-| Exportação em PDF e CSV                                               | ✅     | `RelatorioScreen`, `utils/exportacao.ts`                        |
-| Filtros da lista; estados vazios e de erro                            | ✅     | `ListaScreen`, `PerfilScreen`                                   |
-| APK final                                                             | ⏳ ²   | `eas.json` — gerar com `eas build` (instruções abaixo)          |
-| Vídeo de pitch                                                        | ⏳ ²   | gravar (roteiro em `docs/roteiro-pitch.docx`)                   |
+| Requisito | Status | Onde |
+|-----------|--------|------|
+| Login, criar conta, recuperar senha, sair | ✅ | `LoginScreen`, `AuthContext`, `services/authService.ts` |
+| Sessão persistente e modo demonstração (sem Firebase) | ✅ | `services/firebase.ts` |
+| Sincronização offline-first com Firestore (postagens salvas; a postagem é apagada do banco ao registrar o corte, o histórico permanece) | ✅ | `OcorrenciasContext`, `utils/sincronizacao.ts` |
+| Dashboard (status, ranking, conformidade, indicadores de intervenção) | ✅ | `DashboardScreen`, `utils/estatisticas.ts` |
+| Cadastro com foto → análise → classificação; fallback offline | ✅ | `CadastroScreen`, `services/vegetationApi.ts` (timeout de 15 s) |
+| Modelo XGBoost (altura e dias até o limite) | ✅ ¹ | `backend/modelo.py`, `treinar_modelo.py` |
+| Registro de corte com histórico de intervenções | ✅ | `DetalheScreen`, `utils/intervencoes.ts`, `HistoricoScreen` |
+| Exportação em PDF e CSV | ✅ | `RelatorioScreen`, `utils/exportacao.ts` |
+| Filtros da lista; estados vazios e de erro | ✅ | `ListaScreen`, `PerfilScreen` |
+| APK final | ⏳ ² | `eas.json` — gerar com `eas build` (instruções abaixo) |
+| Vídeo de pitch | ⏳ ² | gravar (roteiro em `docs/roteiro-pitch.docx`) |
 
 ¹ **O modelo é treinado com dados sintéticos.** A Motiva não forneceu medições reais; o gerador (`gerar_dataset`)
 codifica uma dinâmica plausível (mais calor e chuva → crescimento mais rápido). As métricas de
@@ -167,13 +167,13 @@ uvicorn main:app --reload --host 0.0.0.0 --port 8000
 ```
 
 Os modelos treinados já estão em `backend/modelos/`. Para re-treinar: `python treinar_modelo.py`.
-Detalhes e _deploy_ em [`backend/README.md`](./backend/README.md). Sem a API, o app usa o _fallback_ simulado.
+Detalhes e *deploy* em [`backend/README.md`](./backend/README.md). Sem a API, o app usa o *fallback* simulado.
 
 ### 3. Testes
 
 ```bash
 npm run typecheck      # TypeScript estrito
-npm test               # 49 testes do app
+npm test               # 52 testes do app
 cd backend && pytest -q   # 7 testes da API
 ```
 
@@ -182,10 +182,15 @@ cd backend && pytest -q   # 7 testes da API
 ```bash
 npm install -g eas-cli
 eas login
-eas build:configure                      # 1ª vez: vincula o projeto e grava o projectId no app.json
+eas init                                 # 1ª vez: cria/vincula o projeto no Expo e grava o projectId no app.json
 # cadastre as variáveis EXPO_PUBLIC_* no EAS (o build não lê o seu .env) — veja docs/firebase-setup.md
 eas build --platform android --profile preview
 ```
+
+> ⚠️ **Use uma URL HTTPS em `EXPO_PUBLIC_API_URL` no build.** O Android bloqueia tráfego `http://` em apps
+> instalados (release); com um IP de rede local, a API nunca responde e o app cai sempre no modo offline.
+> Publique o backend (Render, Railway, Cloud Run…) ou, para a gravação do vídeo, exponha o `uvicorn` local
+> com um túnel HTTPS (ngrok ou cloudflared) e use a URL gerada.
 
 Ao terminar, o EAS mostra um link para baixar o `.apk`. **Não commite o APK**: envie para o Google Drive ou
 GitHub Releases e cole o link na tabela do topo.
@@ -201,7 +206,7 @@ solicitado → **Instalar**.
 ├── App.tsx                         # Porteiro de autenticação + navegação por abas
 ├── eas.json · app.json · jest.config.js · .env.example
 ├── firebase/firestore.rules        # Regras de segurança do Firestore
-├── __tests__/                      # 49 testes das funções puras e dos mocks
+├── __tests__/                      # 52 testes das funções puras e dos mocks
 ├── src/
 │   ├── screens/                    # Login, Dashboard, Lista, Cadastro, Histórico, Relatório, Detalhe, Perfil
 │   ├── components/                 # OcorrenciaCard, FilterChip, RankingBarra, EstatisticaCard, BottomNav

@@ -30,6 +30,10 @@ describe("validação de login e cadastro", () => {
     expect(traduzirErroAuth("auth/network-request-failed")).toMatch(/conexão/);
     expect(traduzirErroAuth("codigo/desconhecido")).toMatch(/Tente novamente/);
     expect(traduzirErroAuth(undefined)).toMatch(/Tente novamente/);
+    // erro desconhecido expõe o código para diagnóstico
+    expect(traduzirErroAuth("auth/algo-novo")).toContain("(auth/algo-novo)");
+    expect(traduzirErroAuth("auth/configuration-not-found")).toMatch(/Authentication/);
+    expect(traduzirErroAuth("app/firebase-off")).toMatch(/não inicializou/);
   });
 });
 

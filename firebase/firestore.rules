@@ -14,14 +14,15 @@ service cloud.firestore {
       allow read, write: if logado() && request.auth.uid == uid;
     }
 
-    // Trechos em monitoramento: equipe autenticada lê e grava; ninguém apaga
-    // (uma roçada é registrada em `intervencoes`, não por exclusão).
+    // Trechos em monitoramento: equipe autenticada lê, grava e apaga.
+    // A exclusão acontece quando a roçada é registrada; o registro permanente do corte
+    // fica em `intervencoes` (imutável), então nenhum histórico se perde.
     match /ocorrencias/{id} {
       allow read: if logado();
       allow create: if logado()
         && request.resource.data.keys().hasAll(['local', 'risco', 'data']);
       allow update: if logado();
-      allow delete: if false;
+      allow delete: if logado();
     }
 
     // Histórico de intervenções: imutável depois de criado (trilha de auditoria)
