@@ -163,6 +163,7 @@ export default function CadastroScreen({
         } catch (err) {
           // API indisponível — cai no modo simulado em vez de travar o operador.
           if (!(err instanceof VegetationApiError)) throw err;
+          console.warn("[api] Análise falhou, usando o modo offline:", err.message);
           resultado = analisarFotoVegetacaoSimulado();
           origem = "offline";
         }

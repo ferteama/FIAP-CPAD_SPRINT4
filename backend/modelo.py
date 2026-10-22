@@ -8,8 +8,7 @@ Dois regressores XGBoost:
 Entradas: cobertura de vegetação (% da imagem, via OpenCV), temperatura (°C)
 e chuva acumulada nos últimos 7 dias (mm).
 
-ATENÇÃO — dados sintéticos: a Motiva ainda não forneceu um histórico real de
-medições. O dataset usado no treino (treinar_modelo.py) é gerado a partir de
+ATENÇÃO — dados sintéticos: O dataset usa do treino (treinar_modelo.py) que é gerado a partir de
 uma dinâmica de crescimento plausível (mais calor e chuva = crescimento mais
 rápido). Quando houver dados reais, basta trocar a função `gerar_dataset`
 pelo carregamento do CSV e re-treinar — o restante do pipeline não muda.

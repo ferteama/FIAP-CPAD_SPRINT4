@@ -24,7 +24,9 @@
           "cameraPermission": "O app usa a câmera para registrar fotos do local da ocorrência."
         }
       ],
-      "expo-router"
+      "expo-router",
+      "expo-build-properties",
+      "expo-sharing"
     ],
     "ios": {
       "bundleIdentifier": "br.com.motiva.dronevisionwatch",

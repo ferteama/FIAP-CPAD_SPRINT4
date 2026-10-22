@@ -1,32 +1,25 @@
-# Dependências
 node_modules/
-
-# Expo / Metro — arquivos gerados localmente (não versionar)
 .expo/
 .expo-shared/
 dist/
 web-build/
-
-# Segredos e configuração local
+coverage/
 .env
 .env.*
 !.env.example
-
-# Builds nativos (o APK vai para o Google Drive / GitHub Releases, não para o repositório)
 *.apk
 *.aab
 *.ipa
 android/
 ios/
-
-# Backend Python
+google-services.json
+GoogleService-Info.plist
+*adminsdk*.json
+serviceAccount*.json
 __pycache__/
 *.pyc
 backend/.venv/
-backend/venv/
 backend/.pytest_cache/
-
-# Sistema / editor
+*.log
 .DS_Store
-.vscode/
-.idea/
+.venv/

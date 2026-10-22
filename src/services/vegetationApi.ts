@@ -16,6 +16,8 @@
  *   (não "localhost" — o celular/emulador não enxerga localhost do seu PC).
  */
 
+import { Platform } from "react-native";
+
 import { NivelRisco } from "../types/nivelRisco";
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL ?? "http://192.168.0.10:8000";
@@ -60,13 +62,25 @@ export async function analisarFotoVegetacao(
 
   const formData = new FormData();
 
-  // React Native aceita esse formato "pseudo-File" para multipart/form-data.
-  // O nome/tipo do arquivo importam para o backend conseguir decodificar a imagem.
-  formData.append("foto", {
-    uri: fotoUri,
-    name: "vegetacao.jpg",
-    type: "image/jpeg",
-  } as any);
+  if (Platform.OS === "web") {
+    // No navegador (react-native-web) o formato "pseudo-File" do React Native NÃO funciona:
+    // o objeto vira o texto "[object Object]" e a API recusa com 422. Aqui é preciso
+    // buscar a imagem (URI blob:/data:) e enviá-la como um Blob com nome de arquivo.
+    try {
+      const blob = await (await fetch(fotoUri)).blob();
+      formData.append("foto", blob, "vegetacao.jpg");
+    } catch {
+      throw new VegetationApiError("Não foi possível ler a foto selecionada.");
+    }
+  } else {
+    // Android/iOS aceitam esse formato "pseudo-File" para multipart/form-data.
+    // O nome/tipo do arquivo importam para o backend conseguir decodificar a imagem.
+    formData.append("foto", {
+      uri: fotoUri,
+      name: "vegetacao.jpg",
+      type: "image/jpeg",
+    } as any);
+  }
   formData.append("local", local);
   if (opcoes.temperaturaC !== undefined) formData.append("temperatura_c", String(opcoes.temperaturaC));
   if (opcoes.chuvaMm !== undefined) formData.append("chuva_mm", String(opcoes.chuvaMm));

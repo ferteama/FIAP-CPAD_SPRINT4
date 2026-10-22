@@ -24,7 +24,7 @@ export default function App() {
   return (
     <AuthProvider>
       <ConfigDemoProvider>
-        <StatusBar barStyle="dark-content" backgroundColor={CORES.background} />
+        <StatusBar barStyle="dark-content" />
         <SafeAreaView style={styles.safeArea}>
           <Raiz />
         </SafeAreaView>
