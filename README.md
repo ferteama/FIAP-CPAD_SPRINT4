@@ -23,7 +23,7 @@
 | Item                                        | Link                                                                   |
 | ------------------------------------------- | ---------------------------------------------------------------------- |
 | 📱 APK final (Android)                      | https://github.com/ferteama/FIAP-CPAD_SPRINT4/releases/tag/version-3.0 |
-| 🎬 Vídeo de pitch e demonstração (Sprint 4) | _(colar o link do YouTube não listado)_                                |
+| 🎬 Vídeo de pitch e demonstração (Sprint 4) | https://youtu.be/lLcxRTfpdqU                                           |
 | 🎬 Vídeo de demonstração (Sprint 3)         | https://youtu.be/4RbNBSrX2F0                                           |
 | 💼 Plano de negócio                         | [`docs/plano-de-negocio.docx`](./docs/plano-de-negocio.docx)           |
 | 🧪 Documento de testes manuais              | [`docs/testes-manuais-sprint4.md`](./docs/testes-manuais-sprint4.md)   |
